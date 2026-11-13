@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   ShoppingBag,
   Trash2,
@@ -14,6 +15,7 @@ import { useCart } from '../context/CartContext';
 import { formatCurrency } from '../utils/formatters';
 import { QuantitySelector } from '../components/common/QuantitySelector';
 import { DietaryBadge } from '../components/common/Badge';
+import { Reveal } from '../components/common/ScrollReveal';
 
 export const CartPage = () => {
   const {
@@ -40,17 +42,19 @@ export const CartPage = () => {
 
   if (items.length === 0) {
     return (
-      <div className="py-24 max-w-2xl mx-auto px-4 text-center">
-        <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-[#181511] border border-[#D6A84F]/30 flex items-center justify-center text-[#AAA39A]">
-          <ShoppingBag className="w-12 h-12 stroke-[1.5]" />
+      <div className="py-24 sm:py-32 max-w-xl mx-auto px-4 text-center">
+        <div className="w-20 h-20 mx-auto mb-6 bg-[#12100E] border border-[#D6A84F]/30 flex items-center justify-center text-[#D6A84F]">
+          <ShoppingBag className="w-8 h-8 stroke-[1.5]" />
         </div>
-        <h1 className="font-serif text-3xl font-bold text-[#F8F5EF] mb-3">Your Cart is Empty</h1>
-        <p className="text-sm text-[#AAA39A] leading-relaxed max-w-md mx-auto mb-8">
-          You haven't added any culinary dishes yet. Explore our handcrafted menu to build your feast.
+        <h1 className="font-luxury text-3xl sm:text-4xl font-light text-[#F5F0E8] mb-3">
+          Your Dining Cart Is Empty
+        </h1>
+        <p className="text-xs sm:text-sm text-[#8A7E72] font-light leading-relaxed max-w-sm mx-auto mb-8">
+          No culinary delicacies have been selected yet. Browse our handcrafted reserve catalogue to assemble your feast.
         </p>
         <Link
           to="/menu"
-          className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-[#D6A84F] to-[#B08332] text-[#0B0B0B] font-bold text-xs uppercase tracking-wider hover:brightness-110 shadow-gold-sm transition-all"
+          className="btn-luxury-primary px-8 py-3.5 text-xs tracking-[0.2em] inline-flex items-center gap-2"
         >
           <span>Explore Food Menu</span>
           <ArrowRight className="w-4 h-4" />
@@ -60,75 +64,75 @@ export const CartPage = () => {
   }
 
   return (
-    <div className="py-12 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="py-12 sm:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Title */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-[#262118]">
+      <Reveal className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10 pb-6 border-b border-[#1E1B15]">
         <div>
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#F8F5EF]">
-            Shopping Cart
+          <span className="text-[10px] uppercase tracking-[0.25em] text-[#D6A84F] font-semibold block mb-1">
+            Order Review
+          </span>
+          <h1 className="font-luxury text-3xl sm:text-5xl font-light text-[#F5F0E8]">
+            Your Dining <span className="italic text-gradient-gold">Selection</span>
           </h1>
-          <p className="text-xs text-[#AAA39A] mt-1">
-            Review your order before proceeding to simulated checkout.
-          </p>
         </div>
 
         <button
           onClick={clearCart}
-          className="text-xs text-[#AAA39A] hover:text-red-400 transition-colors flex items-center gap-1.5"
+          className="text-xs text-[#8A7E72] hover:text-red-400 transition-colors flex items-center gap-1.5 uppercase tracking-wider"
         >
           <Trash2 className="w-3.5 h-3.5" />
-          <span>Clear entire cart</span>
+          <span>Clear All Dishes</span>
         </button>
-      </div>
+      </Reveal>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-14 items-start">
         {/* Left Column: Cart Items List */}
         <div className="lg:col-span-2 space-y-4">
           {items.map((item) => (
             <div
               key={item.id}
-              className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 sm:p-5 bg-[#151310] border border-[#2B251B] hover:border-[#D6A84F]/40 rounded-2xl transition-all"
+              className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 bg-[#12100E] border border-[#221F1A] hover:border-[#D6A84F]/40 transition-all shadow-[0_5px_20px_rgba(0,0,0,0.5)]"
             >
               <img
                 src={item.image}
                 alt={item.name}
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover flex-shrink-0"
+                className="w-20 h-20 sm:w-24 sm:h-24 object-cover flex-shrink-0 border border-[#2B251B]"
               />
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2 mb-1.5">
                   <DietaryBadge isVeg={item.isVeg} />
                   <Link
                     to={`/menu/${item.slug}`}
-                    className="font-serif text-base sm:text-lg font-bold text-[#F8F5EF] hover:text-[#D6A84F] transition-colors truncate"
+                    className="font-luxury text-xl font-light text-[#F5F0E8] hover:text-[#D6A84F] transition-colors truncate"
                   >
                     {item.name}
                   </Link>
                 </div>
-                <p className="text-xs text-[#AAA39A] line-clamp-1 mb-2">{item.description}</p>
-                <div className="text-xs text-[#D6A84F] font-bold">
+                <p className="text-xs text-[#8A7E72] font-light line-clamp-1 mb-2">{item.description}</p>
+                <div className="text-xs text-gradient-gold font-mono font-medium">
                   {formatCurrency(item.price)} each
                 </div>
               </div>
 
               {/* Quantity selector & total */}
-              <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-[#221E18]">
+              <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-[#1E1B15]">
                 <QuantitySelector
                   quantity={item.quantity}
                   onIncrease={() => updateQuantity(item.id, item.quantity + 1)}
                   onDecrease={() => updateQuantity(item.id, item.quantity - 1)}
                 />
 
-                <div className="text-right min-w-[80px]">
-                  <span className="font-serif text-base font-bold text-[#F8F5EF] block">
+                <div className="text-right min-w-[90px]">
+                  <span className="font-luxury text-xl font-normal text-gradient-gold block">
                     {formatCurrency(item.price * item.quantity)}
                   </span>
                 </div>
 
                 <button
                   onClick={() => removeFromCart(item.id)}
-                  className="p-2 text-[#AAA39A] hover:text-red-400 hover:bg-[#251A1A] rounded-lg transition-colors"
-                  aria-label={`Remove ${item.name}`}
+                  className="text-[#6A6258] hover:text-red-400 p-2 transition-colors"
+                  aria-label="Remove item"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -136,37 +140,38 @@ export const CartPage = () => {
             </div>
           ))}
 
-          <div className="pt-4 flex items-center justify-between">
+          {/* Continue Shopping Link */}
+          <div className="pt-4">
             <Link
               to="/menu"
-              className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#D6A84F] hover:text-[#F3DC9B] transition-colors"
+              className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#8A7E72] hover:text-[#D6A84F] transition-colors"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Continue Shopping</span>
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Add More Delicacies</span>
             </Link>
           </div>
         </div>
 
-        {/* Right Column: Order Summary Card */}
-        <div className="bg-[#14120E] border border-[#2B251B] rounded-2xl p-6 sm:p-7 shadow-2xl space-y-6">
-          <h2 className="font-serif text-xl font-bold text-[#F8F5EF] border-b border-[#252018] pb-4">
+        {/* Right Column: Order Summary Receipt Card */}
+        <div className="bg-[#12100E] border border-[#26221B] p-6 sm:p-8 shadow-[0_15px_40px_rgba(0,0,0,0.6)] space-y-6">
+          <h2 className="font-luxury text-2xl font-light text-[#F5F0E8] border-b border-[#1E1B15] pb-4">
             Order Summary
           </h2>
 
           {/* Promo Code Input */}
           <div>
-            <label className="block text-xs font-semibold text-[#AAA39A] mb-2 uppercase tracking-wider">
-              Have a Promo Code?
+            <label className="block text-[10px] font-semibold text-[#8A7E72] mb-2 uppercase tracking-[0.2em]">
+              Privilege Voucher
             </label>
             {couponCode ? (
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#D6A84F]/10 border border-[#D6A84F]/30 text-xs">
+              <div className="flex items-center justify-between p-3 bg-[#D6A84F]/10 border border-[#D6A84F]/40 text-xs">
                 <div className="flex items-center gap-2 text-[#D6A84F] font-semibold">
                   <Tag className="w-4 h-4" />
                   <span>{couponCode} Applied</span>
                 </div>
                 <button
                   onClick={removeCoupon}
-                  className="text-xs text-[#AAA39A] hover:text-red-400 underline"
+                  className="text-xs text-[#8A7E72] hover:text-red-400 underline uppercase tracking-wider"
                 >
                   Remove
                 </button>
@@ -178,11 +183,11 @@ export const CartPage = () => {
                   placeholder="Code: SIZZLE20 or FIRSTBITE"
                   value={inputCoupon}
                   onChange={(e) => setInputCoupon(e.target.value)}
-                  className="flex-1 bg-[#1C1914] border border-[#332C20] focus:border-[#D6A84F] focus:outline-none rounded-xl px-3 py-2 text-xs text-[#F8F5EF] uppercase placeholder:normal-case placeholder-[#6A6357]"
+                  className="flex-1 bg-[#0A0908] border border-[#2A241C] focus:border-[#D6A84F] focus:outline-none px-3 py-2 text-xs text-[#F5F0E8] uppercase placeholder:normal-case placeholder-[#5A5247]"
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#252017] hover:bg-[#D6A84F] hover:text-[#0B0B0B] text-xs font-bold rounded-xl text-[#F8F5EF] border border-[#3A3326] transition-all"
+                  className="px-4 py-2 bg-[#1A1815] hover:bg-[#D6A84F] hover:text-[#080807] text-xs font-semibold text-[#F5F0E8] border border-[#3A3326] transition-all uppercase tracking-wider"
                 >
                   Apply
                 </button>
@@ -191,61 +196,61 @@ export const CartPage = () => {
           </div>
 
           {/* Fee Breakdown */}
-          <div className="space-y-3 text-xs border-y border-[#252018] py-4">
-            <div className="flex justify-between text-[#AAA39A]">
-              <span>Item Subtotal</span>
-              <span className="text-[#F8F5EF] font-medium">{formatCurrency(totals.subtotal)}</span>
+          <div className="space-y-3 text-xs border-y border-[#1E1B15] py-4">
+            <div className="flex justify-between text-[#8A7E72]">
+              <span>Dishes Subtotal</span>
+              <span className="text-[#F5F0E8] font-mono">{formatCurrency(totals.subtotal)}</span>
             </div>
 
-            <div className="flex justify-between text-[#AAA39A]">
-              <span>Delivery Fee (Demo)</span>
-              <span className={totals.isFreeDelivery ? 'text-emerald-400 font-semibold' : 'text-[#F8F5EF]'}>
-                {totals.isFreeDelivery ? 'FREE (Orders over ₹500)' : formatCurrency(totals.deliveryFee)}
+            <div className="flex justify-between text-[#8A7E72]">
+              <span>Delivery Courtesy (Demo)</span>
+              <span className={totals.isFreeDelivery ? 'text-emerald-400 font-semibold' : 'text-[#F5F0E8] font-mono'}>
+                {totals.isFreeDelivery ? 'COMPLIMENTARY' : formatCurrency(totals.deliveryFee)}
               </span>
             </div>
 
-            <div className="flex justify-between text-[#AAA39A]">
+            <div className="flex justify-between text-[#8A7E72]">
               <span>Demo Restaurant GST (5%)</span>
-              <span className="text-[#F8F5EF]">{formatCurrency(totals.demoTax)}</span>
+              <span className="text-[#F5F0E8] font-mono">{formatCurrency(totals.demoTax)}</span>
             </div>
 
-            <div className="flex justify-between text-[#AAA39A]">
-              <span>Packaging & Eco Container</span>
-              <span className="text-[#F8F5EF]">{formatCurrency(totals.packagingFee)}</span>
+            <div className="flex justify-between text-[#8A7E72]">
+              <span>Eco Thermal Packaging</span>
+              <span className="text-[#F5F0E8] font-mono">{formatCurrency(totals.packagingFee)}</span>
             </div>
 
             {totals.discount > 0 && (
               <div className="flex justify-between text-emerald-400 font-semibold">
-                <span>Coupon Savings</span>
-                <span>-{formatCurrency(totals.discount)}</span>
+                <span>Voucher Privileges</span>
+                <span className="font-mono">-{formatCurrency(totals.discount)}</span>
               </div>
             )}
           </div>
 
           {/* Grand Total */}
           <div className="flex items-baseline justify-between">
-            <span className="text-sm font-bold text-[#F8F5EF]">Grand Total</span>
+            <span className="text-xs uppercase tracking-[0.2em] font-semibold text-[#8A7E72]">Grand Total</span>
             <div className="text-right">
-              <span className="font-serif text-2xl sm:text-3xl font-bold text-[#D6A84F] block">
+              <span className="font-luxury text-3xl sm:text-4xl font-normal text-gradient-gold block">
                 {formatCurrency(totals.grandTotal)}
               </span>
-              <span className="text-[10px] text-[#888176]">All demo fees & taxes included</span>
+              <span className="text-[10px] text-[#6A6258] font-mono">Demo taxes & fees included</span>
             </div>
           </div>
 
           {/* Checkout CTA */}
           <button
             onClick={() => navigate('/checkout')}
-            className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-[#D6A84F] to-[#B08332] text-[#0B0B0B] font-bold text-xs sm:text-sm uppercase tracking-wider hover:brightness-110 active:scale-[0.99] transition-all shadow-gold-sm flex items-center justify-center gap-2"
+            className="btn-luxury-primary w-full py-4 text-xs tracking-[0.2em] flex items-center justify-center gap-2"
           >
             <span>Proceed to Checkout</span>
             <ArrowRight className="w-4 h-4" />
           </button>
 
           {/* Prototype Disclosure */}
-          <div className="p-3 bg-[#1B1813] border border-[#2B251B] rounded-xl text-[11px] text-[#888176] flex items-start gap-2">
+          <div className="p-3 bg-[#0A0908] border border-[#221E17] text-[11px] text-[#6A6258] flex items-start gap-2">
             <Info className="w-3.5 h-3.5 text-[#D6A84F] flex-shrink-0 mt-0.5" />
-            <span>
+            <span className="font-light">
               This checkout is a frontend simulation. No actual payment gateway will charge your account.
             </span>
           </div>

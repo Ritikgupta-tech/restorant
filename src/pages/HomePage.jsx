@@ -1,21 +1,10 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useScroll, useTransform, AnimatePresence, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
-  Utensils,
-  ArrowRight,
-  Sparkles,
-  Flame,
-  ChefHat,
-  Award,
-  Clock,
-  MapPin,
-  Phone,
-  ChevronLeft,
-  ChevronRight,
-  Star,
-  Quote,
-  Eye,
+  Utensils, ArrowRight, Sparkles, Flame, ChefHat, Award, Clock,
+  MapPin, Phone, ChevronLeft, ChevronRight, Star, Quote, Play,
+  Leaf, TrendingUp, Wine, Coffee,
 } from 'lucide-react';
 import { DISHES, CATEGORIES } from '../data/dishes';
 import { TESTIMONIALS } from '../data/testimonials';
@@ -25,480 +14,765 @@ import { DishCard } from '../components/menu/DishCard';
 import { DishQuickViewModal } from '../components/menu/DishQuickViewModal';
 import { useReservation } from '../context/ReservationContext';
 
+/* ── Scroll-reveal wrapper ── */
+const Reveal = ({ children, delay = 0, direction = 'up', className = '' }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-80px' });
+  const variants = {
+    hidden: {
+      opacity: 0,
+      y: direction === 'up' ? 40 : direction === 'down' ? -40 : 0,
+      x: direction === 'left' ? -40 : direction === 'right' ? 40 : 0,
+    },
+    visible: { opacity: 1, y: 0, x: 0 },
+  };
+  return (
+    <motion.div
+      ref={ref}
+      variants={variants}
+      initial="hidden"
+      animate={isInView ? 'visible' : 'hidden'}
+      transition={{ duration: 0.8, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+/* ── Animated counter ── */
+const Counter = ({ target, suffix = '', duration = 2 }) => {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+  useEffect(() => {
+    if (!isInView) return;
+    let start = 0;
+    const step = target / (duration * 60);
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= target) { setCount(target); clearInterval(timer); }
+      else setCount(Math.floor(start));
+    }, 1000 / 60);
+    return () => clearInterval(timer);
+  }, [isInView, target, duration]);
+  return <span ref={ref}>{count}{suffix}</span>;
+};
+
+/* ── Floating particle ── */
+const FloatingParticle = ({ style }) => (
+  <motion.div
+    className="absolute rounded-full bg-[#D6A84F] pointer-events-none"
+    style={style}
+    animate={{ y: [-20, 20, -20], opacity: [0.1, 0.5, 0.1], scale: [1, 1.5, 1] }}
+    transition={{ duration: 4 + Math.random() * 4, repeat: Infinity, ease: 'easeInOut', delay: Math.random() * 3 }}
+  />
+);
+
 export const HomePage = () => {
   const { openReservation } = useReservation();
   const [selectedQuickDish, setSelectedQuickDish] = useState(null);
   const [activeTestimonialIdx, setActiveTestimonialIdx] = useState(0);
+  const [hoveredCategory, setHoveredCategory] = useState(null);
+
+  const heroRef = useRef(null);
+  const { scrollY } = useScroll();
+  const heroY = useTransform(scrollY, [0, 600], [0, 150]);
+  const heroOpacity = useTransform(scrollY, [0, 400], [1, 0]);
+  const heroScale = useTransform(scrollY, [0, 600], [1, 1.1]);
 
   const featuredDishes = DISHES.filter((d) => d.isFeatured).slice(0, 6);
   const previewGallery = GALLERY_ITEMS.slice(0, 6);
 
-  const nextTestimonial = () => {
-    setActiveTestimonialIdx((prev) => (prev + 1) % TESTIMONIALS.length);
-  };
+  // Auto advance testimonials
+  useEffect(() => {
+    const t = setInterval(() => {
+      setActiveTestimonialIdx(p => (p + 1) % TESTIMONIALS.length);
+    }, 6000);
+    return () => clearInterval(t);
+  }, []);
 
-  const prevTestimonial = () => {
-    setActiveTestimonialIdx((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
+  // Category icons
+  const catConfig = {
+    indian: { icon: Flame, label: 'Indian', img: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=400&q=80' },
+    chinese: { icon: Utensils, label: 'Chinese', img: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=400&q=80' },
+    'fast-food': { icon: TrendingUp, label: 'Fast Food', img: 'https://images.unsplash.com/photo-1604382355076-af4b0eb60143?auto=format&fit=crop&w=400&q=80' },
+    beverages: { icon: Coffee, label: 'Beverages', img: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=400&q=80' },
+    desserts: { icon: Award, label: 'Desserts', img: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=400&q=80' },
   };
 
   return (
-    <div className="relative overflow-hidden">
-      {/* 1. HERO SECTION */}
-      <section className="relative min-h-[85vh] sm:min-h-[90vh] flex items-center justify-center overflow-hidden">
-        {/* Background Hero Image with Slow Zoom Animation */}
-        <div className="absolute inset-0 z-0">
-          <motion.img
-            initial={{ scale: 1.08 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 10, ease: 'easeOut' }}
-            src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1920&q=85"
-            alt="The Sizzle Restaurant Fine Dining Ambience"
+    <div className="bg-luxury-gradient overflow-x-hidden">
+
+      {/* ══════════════════════════════════════════════════════
+          1. CINEMATIC HERO
+         ══════════════════════════════════════════════════════ */}
+      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Parallax Background */}
+        <motion.div className="absolute inset-0 z-0" style={{ y: heroY, scale: heroScale }}>
+          <img
+            src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1920&q=90"
+            alt="Fine Dining Ambience"
             className="w-full h-full object-cover"
           />
-          {/* Cinematic Dark Overlays */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0B] via-[#0B0B0B]/75 to-[#0B0B0B]/40" />
-          <div className="absolute inset-0 bg-radial-vignette opacity-70" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#080807]/50 via-[#080807]/65 to-[#080807]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#080807]/40 via-transparent to-[#080807]/30" />
+        </motion.div>
+
+        {/* Ambient particles */}
+        <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
+          {[...Array(8)].map((_, i) => (
+            <FloatingParticle key={i} style={{
+              width: `${2 + Math.random() * 4}px`,
+              height: `${2 + Math.random() * 4}px`,
+              left: `${10 + Math.random() * 80}%`,
+              top: `${20 + Math.random() * 60}%`,
+            }} />
+          ))}
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+        <motion.div
+          style={{ opacity: heroOpacity }}
+          className="relative z-10 max-w-6xl mx-auto px-6 sm:px-10 text-center py-32"
+        >
+          {/* Pre-heading badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1A1813]/80 border border-[#D6A84F]/40 backdrop-blur-md text-[#D6A84F] text-xs font-semibold uppercase tracking-[0.2em] mb-6 shadow-gold-sm"
+            transition={{ duration: 1, delay: 0.3 }}
+            className="inline-flex items-center gap-3 mb-8"
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Welcome To Fine Dining Excellence</span>
+            <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-[#D6A84F]" />
+            <span className="badge-luxury">
+              <Sparkles className="w-3 h-3" />
+              Premium Fine Dining & Lounge
+            </span>
+            <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[#D6A84F]" />
           </motion.div>
 
+          {/* Main Headline */}
           <motion.h1
-            initial={{ opacity: 0, y: 25 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-serif text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-[#F8F5EF] leading-[1.1] mb-6"
+            transition={{ duration: 1.1, delay: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="font-luxury font-light text-[#F5F0E8] leading-[0.95] tracking-tight mb-6"
+            style={{ fontSize: 'clamp(52px, 10vw, 120px)' }}
           >
-            Welcome to <br />
-            <span className="gold-gradient-text">The Sizzle Restaurant</span>
+            The Art of
+            <br />
+            <em className="gold-text not-italic font-semibold">Sizzle</em>
           </motion.h1>
+
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 1.2, delay: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="w-32 h-[1px] bg-gradient-to-r from-transparent via-[#D6A84F] to-transparent mx-auto mb-6"
+          />
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-base sm:text-xl text-[#AAA39A] max-w-2xl mx-auto font-light leading-relaxed mb-10"
+            transition={{ duration: 0.9, delay: 0.9 }}
+            className="text-sm sm:text-lg font-light text-[#C8BEB0] max-w-2xl mx-auto leading-relaxed tracking-wide mb-12"
           >
-            Experience the perfect blend of taste, ambience and hospitality. Savor hand-curated multi-cuisine masterpieces in a warm champagne-lit sanctuary.
+            Where culinary artistry meets timeless elegance. Experience handcrafted masterpieces, 
+            rare spice journeys, and candlelit dining in Mumbai's most celebrated kitchen.
           </motion.p>
 
+          {/* CTA Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
+            transition={{ duration: 0.9, delay: 1.1 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <Link
-              to="/menu"
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-[#D6A84F] to-[#B08332] text-[#0B0B0B] font-bold text-sm uppercase tracking-wider hover:brightness-110 active:scale-[0.98] transition-all shadow-gold-sm flex items-center justify-center gap-2"
-            >
-              <span>Order Now</span>
-              <ArrowRight className="w-4 h-4" />
+            <Link to="/menu" className="btn-luxury-primary group w-full sm:w-auto">
+              <span>Explore Our Menu</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-
-            <button
-              onClick={openReservation}
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-[#161410]/80 hover:bg-[#201D17] border border-[#D6A84F]/40 text-[#F8F5EF] font-semibold text-sm uppercase tracking-wider backdrop-blur-md hover:border-[#D6A84F] transition-all flex items-center justify-center gap-2"
-            >
-              <Flame className="w-4 h-4 text-[#D6A84F]" />
+            <button onClick={openReservation} className="btn-luxury-outline w-full sm:w-auto">
+              <Flame className="w-4 h-4 text-[#D6A84F] animate-flicker" />
               <span>Reserve a Table</span>
             </button>
           </motion.div>
-        </div>
 
-        {/* Ambient bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#0B0B0B] to-transparent z-10 pointer-events-none" />
-      </section>
-
-      {/* 2. RESTAURANT HIGHLIGHTS */}
-      <section className="relative z-10 py-12 -mt-10 sm:-mt-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {RESTAURANT_INFO.features.map((item, idx) => (
+          {/* Scroll indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2, duration: 1 }}
+            className="absolute bottom-10 left-1/2 -translate-x-1/2"
+          >
             <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1, duration: 0.5 }}
-              className="bg-[#151310]/95 border border-[#2D271D] hover:border-[#D6A84F]/50 rounded-2xl p-6 shadow-xl backdrop-blur-md transition-all group hover:-translate-y-1"
+              animate={{ y: [0, 10, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="flex flex-col items-center gap-2 text-[#D6A84F]/50"
             >
-              <div className="w-12 h-12 rounded-xl bg-[#201C15] border border-[#D6A84F]/30 flex items-center justify-center text-[#D6A84F] mb-4 group-hover:scale-110 group-hover:border-[#D6A84F] transition-all">
-                {idx === 0 && <ChefHat className="w-6 h-6" />}
-                {idx === 1 && <Sparkles className="w-6 h-6" />}
-                {idx === 2 && <Flame className="w-6 h-6" />}
-                {idx === 3 && <Award className="w-6 h-6" />}
-              </div>
-              <h3 className="font-serif text-lg font-bold text-[#F8F5EF] mb-1.5">
-                {item.title}
-              </h3>
-              <p className="text-xs text-[#AAA39A] leading-relaxed">
-                {item.description}
-              </p>
+              <span className="text-[9px] uppercase tracking-[0.3em]">Scroll</span>
+              <div className="w-[1px] h-12 bg-gradient-to-b from-[#D6A84F]/50 to-transparent" />
             </motion.div>
-          ))}
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
-      {/* 3. POPULAR CUISINE CATEGORIES */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D6A84F] block mb-2">
-            Curated Palate
-          </span>
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#F8F5EF]">
-            Popular Categories
-          </h2>
-          <div className="w-16 h-[2px] bg-[#D6A84F] mx-auto mt-4" />
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {CATEGORIES.filter((c) => c.id !== 'all').map((cat) => (
-            <Link
-              key={cat.id}
-              to={`/menu?category=${cat.id}`}
-              className="group relative bg-[#161411] border border-[#29241B] hover:border-[#D6A84F] rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-gold-sm flex flex-col items-center justify-center"
-            >
-              <div className="w-14 h-14 rounded-full bg-[#1F1B14] border border-[#3A3326] group-hover:border-[#D6A84F] flex items-center justify-center text-[#D6A84F] mb-3 group-hover:scale-110 transition-all">
-                {cat.id === 'indian' && <Flame className="w-6 h-6" />}
-                {cat.id === 'chinese' && <Utensils className="w-6 h-6" />}
-                {cat.id === 'fast-food' && <Sparkles className="w-6 h-6" />}
-                {cat.id === 'beverages' && <Clock className="w-6 h-6" />}
-                {cat.id === 'desserts' && <Award className="w-6 h-6" />}
-              </div>
-              <h3 className="font-serif text-base font-bold text-[#F8F5EF] group-hover:text-[#D6A84F] transition-colors">
-                {cat.name}
-              </h3>
-              <span className="text-[11px] text-[#AAA39A] mt-1">
-                {cat.count} Masterpieces
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* 4. FEATURED SIGNATURE DISHES */}
-      <section className="py-20 bg-[#100E0C] border-y border-[#262017]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-12">
-            <div>
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D6A84F] block mb-2">
-                Chef's Handpicked
-              </span>
-              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#F8F5EF]">
-                Featured Signature Dishes
-              </h2>
+      {/* ══════════════════════════════════════════════════════
+          2. MARQUEE STATS BAR
+         ══════════════════════════════════════════════════════ */}
+      <div className="relative overflow-hidden border-y border-[#D6A84F]/15 bg-[#0F0E0C] py-5">
+        <div className="animate-marquee flex gap-0 whitespace-nowrap select-none">
+          {[...Array(2)].map((_, arrIdx) => (
+            <div key={arrIdx} className="flex items-center gap-0">
+              {[
+                { label: 'Dishes on Menu', value: '24+', icon: Utensils },
+                { label: 'Happy Guests (Demo)', value: '10K+', icon: Star },
+                { label: 'Years of Sizzle', value: '8+', icon: Award },
+                { label: 'Expert Chefs', value: '12', icon: ChefHat },
+                { label: 'Cuisine Categories', value: '5', icon: Flame },
+                { label: 'Private Dining Rooms', value: '3', icon: Wine },
+              ].map((stat, i) => (
+                <div key={i} className="inline-flex items-center gap-10 px-12">
+                  <div className="flex items-center gap-4">
+                    <stat.icon className="w-4 h-4 text-[#D6A84F]" />
+                    <span className="font-luxury text-2xl text-[#D6A84F]">{stat.value}</span>
+                    <span className="text-[11px] uppercase tracking-[0.2em] text-[#A09080]">{stat.label}</span>
+                  </div>
+                  <div className="w-[1px] h-6 bg-[#D6A84F]/20" />
+                </div>
+              ))}
             </div>
-            <Link
-              to="/menu"
-              className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-bold text-[#D6A84F] hover:text-[#F3DC9B] transition-colors"
-            >
-              <span>Explore Complete Menu</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+          ))}
+        </div>
+        {/* Fade edges */}
+        <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#0F0E0C] to-transparent pointer-events-none z-10" />
+        <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#0F0E0C] to-transparent pointer-events-none z-10" />
+      </div>
+
+      {/* ══════════════════════════════════════════════════════
+          3. RESTAURANT HIGHLIGHTS — FOUR PILLARS
+         ══════════════════════════════════════════════════════ */}
+      <section className="py-24 sm:py-32 bg-dot-grid">
+        <div className="container-luxury">
+          <Reveal className="section-header mb-16">
+            <span className="section-label">The Sizzle Experience</span>
+            <h2 className="section-title">Why Guests Return</h2>
+            <div className="section-divider mt-4" />
+          </Reveal>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {RESTAURANT_INFO.features.map((item, idx) => {
+              const icons = [ChefHat, Sparkles, Flame, Award];
+              const Icon = icons[idx];
+              return (
+                <Reveal key={idx} delay={idx * 0.1}>
+                  <div className="card-luxury p-8 h-full flex flex-col group cursor-default">
+                    <div className="relative mb-6">
+                      <div className="w-14 h-14 rounded-luxury bg-gradient-to-br from-[#D6A84F]/15 to-[#D6A84F]/5 border border-[#D6A84F]/30 flex items-center justify-center transition-all duration-500 group-hover:border-[#D6A84F] group-hover:shadow-gold-sm">
+                        <Icon className="w-6 h-6 text-[#D6A84F]" />
+                      </div>
+                      <div className="absolute -top-1 -left-1 text-6xl font-luxury font-bold text-[#D6A84F]/5 select-none leading-none">
+                        {String(idx + 1).padStart(2, '0')}
+                      </div>
+                    </div>
+                    <h3 className="font-display text-lg font-bold text-[#F5F0E8] mb-3 group-hover:text-[#D6A84F] transition-colors duration-300">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-[#A09080] leading-relaxed flex-1">
+                      {item.description}
+                    </p>
+                    <div className="mt-6 h-[1px] bg-gradient-to-r from-[#D6A84F]/40 to-transparent scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500" />
+                  </div>
+                </Reveal>
+              );
+            })}
           </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════
+          4. CUISINE CATEGORIES — IMMERSIVE CARDS
+         ══════════════════════════════════════════════════════ */}
+      <section className="py-24 sm:py-32 bg-[#0A0908]">
+        <div className="container-luxury">
+          <Reveal className="section-header mb-16">
+            <span className="section-label">Curated Palate</span>
+            <h2 className="section-title">Explore by Cuisine</h2>
+            <div className="section-divider mt-4" />
+          </Reveal>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {CATEGORIES.filter(c => c.id !== 'all').map((cat, idx) => {
+              const cfg = catConfig[cat.id];
+              const Icon = cfg?.icon || Flame;
+              const isHovered = hoveredCategory === cat.id;
+              return (
+                <Reveal key={cat.id} delay={idx * 0.08}>
+                  <Link
+                    to={`/menu?category=${cat.id}`}
+                    onMouseEnter={() => setHoveredCategory(cat.id)}
+                    onMouseLeave={() => setHoveredCategory(null)}
+                    className="relative group block aspect-[3/4] rounded-luxury overflow-hidden border border-[#D6A84F]/15 hover:border-[#D6A84F]/50 transition-all duration-500"
+                  >
+                    {/* Background image */}
+                    <div className="absolute inset-0 overflow-hidden">
+                      {cfg?.img && (
+                        <motion.img
+                          src={cfg.img}
+                          alt={cat.name}
+                          className="w-full h-full object-cover"
+                          animate={{ scale: isHovered ? 1.1 : 1 }}
+                          transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        />
+                      )}
+                    </div>
+                    {/* Gradient overlays */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#080807]/95 via-[#080807]/40 to-[#080807]/10" />
+                    <motion.div
+                      className="absolute inset-0 bg-[#D6A84F]/10"
+                      animate={{ opacity: isHovered ? 1 : 0 }}
+                      transition={{ duration: 0.4 }}
+                    />
+                    {/* Content */}
+                    <div className="absolute inset-0 flex flex-col justify-end p-5">
+                      <div className="mb-3">
+                        <div className={`w-10 h-10 rounded-luxury flex items-center justify-center transition-all duration-400 ${isHovered ? 'bg-[#D6A84F] text-[#080807]' : 'bg-[#D6A84F]/15 text-[#D6A84F] border border-[#D6A84F]/30'}`}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+                      </div>
+                      <h3 className="font-display text-base font-bold text-[#F5F0E8] mb-1 group-hover:text-[#D6A84F] transition-colors">
+                        {cat.name}
+                      </h3>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-[#A09080] uppercase tracking-[0.15em]">
+                          {DISHES.filter(d => d.category === cat.id).length} Dishes
+                        </span>
+                        <motion.div
+                          animate={{ x: isHovered ? 0 : 8, opacity: isHovered ? 1 : 0 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <ArrowRight className="w-3.5 h-3.5 text-[#D6A84F]" />
+                        </motion.div>
+                      </div>
+                    </div>
+                    {/* Top gold line on hover */}
+                    <motion.div
+                      className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#D6A84F] to-transparent"
+                      animate={{ opacity: isHovered ? 1 : 0 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </Link>
+                </Reveal>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════
+          5. FEATURED SIGNATURE DISHES
+         ══════════════════════════════════════════════════════ */}
+      <section className="py-24 sm:py-32 bg-[#080807]">
+        <div className="container-luxury">
+          <Reveal>
+            <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-16">
+              <div>
+                <span className="section-label">Chef's Handpicked Selection</span>
+                <h2 className="section-title mt-2 text-left">Signature Dishes</h2>
+                <div className="section-divider-left mt-4" />
+              </div>
+              <Link
+                to="/menu"
+                className="group inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] font-semibold text-[#D6A84F] hover-underline-gold"
+              >
+                <span>View Complete Menu</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </Reveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {featuredDishes.map((dish) => (
-              <DishCard
-                key={dish.id}
-                dish={dish}
-                onQuickView={(d) => setSelectedQuickDish(d)}
-              />
+            {featuredDishes.map((dish, idx) => (
+              <Reveal key={dish.id} delay={idx * 0.08}>
+                <DishCard dish={dish} onQuickView={(d) => setSelectedQuickDish(d)} />
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 5. ABOUT RESTAURANT HIGHLIGHT SECTION */}
-      <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="relative">
-            <div className="relative rounded-3xl overflow-hidden border border-[#D6A84F]/30 shadow-2xl">
-              <img
-                src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1000&q=80"
-                alt="The Sizzle Interior Atmosphere"
-                className="w-full h-[450px] object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-[#14120E]/90 border border-[#D6A84F]/30 backdrop-blur-md">
-                <p className="font-serif text-base font-bold text-[#F8F5EF]">
-                  "Cooking is an act of romance and patience."
-                </p>
-                <p className="text-xs text-[#D6A84F] mt-1">— Executive Culinary Master</p>
+      {/* ══════════════════════════════════════════════════════
+          6. ABOUT / STORY SPLIT SECTION
+         ══════════════════════════════════════════════════════ */}
+      <section className="py-24 sm:py-32 bg-[#0A0908]">
+        <div className="container-luxury">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            {/* Left: imagery composition */}
+            <Reveal direction="left">
+              <div className="relative">
+                {/* Main image */}
+                <div className="relative z-10 img-overlay-hover rounded-luxury overflow-hidden border border-[#D6A84F]/20">
+                  <img
+                    src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80"
+                    alt="The Sizzle Dining Hall"
+                    className="w-full h-[520px] object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#080807]/80 to-transparent" />
+                </div>
+                {/* Floating accent quote card */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20, y: 20 }}
+                  whileInView={{ opacity: 1, x: 0, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.6, duration: 0.8 }}
+                  className="absolute -bottom-6 -right-6 max-w-xs glass-card p-6 rounded-luxury shadow-luxury z-20"
+                >
+                  <Quote className="w-6 h-6 text-[#D6A84F] mb-3 opacity-60" />
+                  <p className="font-luxury text-base italic text-[#F5F0E8] leading-relaxed">
+                    "Cooking is not a craft — it is poetry written in fire and spice."
+                  </p>
+                  <div className="flex items-center gap-3 mt-4">
+                    <div className="w-8 h-[1px] bg-[#D6A84F]" />
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#D6A84F]">Executive Chef</span>
+                  </div>
+                </motion.div>
+
+                {/* Small overlay stat badge */}
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.8, duration: 0.7 }}
+                  className="absolute -top-4 -left-4 glass-card px-5 py-4 rounded-luxury z-20 text-center"
+                >
+                  <div className="stat-counter text-3xl text-[#D6A84F]">8+</div>
+                  <div className="text-[9px] uppercase tracking-[0.2em] text-[#A09080] mt-1">Years of Excellence</div>
+                </motion.div>
               </div>
-            </div>
+            </Reveal>
+
+            {/* Right: Story text */}
+            <Reveal direction="right" delay={0.2}>
+              <div className="space-y-6">
+                <div>
+                  <span className="section-label">Our Culinary Philosophy</span>
+                  <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-[#F5F0E8] mt-3 leading-[1.1]">
+                    Where Fire, Flavour &
+                    <br />
+                    <span className="gold-text">Elegance Unite</span>
+                  </h2>
+                  <div className="section-divider-left mt-5" />
+                </div>
+
+                <p className="text-sm text-[#A09080] leading-relaxed">
+                  At The Sizzle Restaurant, we believe dining is an act of intimacy — a conversation between the chef's vision and the guest's soul. Since 2018, our kitchen has been a sanctuary where ancient Indian clay-oven traditions harmonise with Szechuan wok fire and Parisian pastry craft.
+                </p>
+
+                <p className="text-sm text-[#A09080] leading-relaxed">
+                  Every spice is stone-ground in our own spice atelier. Every sauce is slow-reduced over hours. Every plate is an act of obsession.
+                </p>
+
+                {/* Key attributes */}
+                <div className="grid grid-cols-2 gap-4 py-4">
+                  {[
+                    { icon: Leaf, text: 'Organic Farm Sourcing' },
+                    { icon: ChefHat, text: 'Michelin-Standard Chefs' },
+                    { icon: Wine, text: 'Curated Wine Cellar' },
+                    { icon: Award, text: 'Award Dining Heritage' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-luxury bg-[#D6A84F]/10 border border-[#D6A84F]/25 flex items-center justify-center flex-shrink-0">
+                        <item.icon className="w-4 h-4 text-[#D6A84F]" />
+                      </div>
+                      <span className="text-xs font-medium text-[#C8BEB0]">{item.text}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap gap-4 pt-2">
+                  <Link to="/about" className="btn-luxury-primary">
+                    <span>Read Our Story</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <button onClick={openReservation} className="btn-luxury-outline">
+                    Reserve a Table
+                  </button>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════
+          7. GALLERY PREVIEW — MASONRY-STYLE
+         ══════════════════════════════════════════════════════ */}
+      <section className="py-24 sm:py-32 bg-[#080807] border-t border-[#D6A84F]/10">
+        <div className="container-luxury">
+          <Reveal className="section-header mb-16">
+            <span className="section-label">Visual Journey</span>
+            <h2 className="section-title">Atmosphere & Artistry</h2>
+            <div className="section-divider mt-4" />
+          </Reveal>
+
+          {/* Asymmetric gallery grid */}
+          <div className="grid grid-cols-12 grid-rows-3 gap-3 h-[600px] sm:h-[700px]">
+            {previewGallery.map((item, idx) => {
+              // Span configs for a compelling masonry-like layout
+              const spanConfig = [
+                'col-span-7 row-span-2',
+                'col-span-5 row-span-1',
+                'col-span-5 row-span-1',
+                'col-span-4 row-span-1',
+                'col-span-4 row-span-1',
+                'col-span-4 row-span-1',
+              ];
+              return (
+                <Reveal key={item.id} delay={idx * 0.07} className={spanConfig[idx]}>
+                  <Link
+                    to="/gallery"
+                    className="group relative block w-full h-full rounded-luxury overflow-hidden border border-[#D6A84F]/10 hover:border-[#D6A84F]/50 transition-all duration-500"
+                  >
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#080807]/90 via-[#080807]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <span className="text-[9px] uppercase tracking-[0.2em] text-[#D6A84F] font-semibold">
+                        {item.category}
+                      </span>
+                      <h4 className="font-display text-sm sm:text-base font-bold text-[#F5F0E8]">
+                        {item.title}
+                      </h4>
+                    </div>
+                    {/* Hover gold line top */}
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#D6A84F] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </Link>
+                </Reveal>
+              );
+            })}
           </div>
 
-          <div className="space-y-6">
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D6A84F] block">
-              Our Food Philosophy
-            </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#F8F5EF] leading-tight">
-              Crafting Unforgettable Flavours Since 2018
-            </h2>
-            <p className="text-sm text-[#AAA39A] leading-relaxed">
-              At The Sizzle Restaurant, our kitchen is an artisanal sanctuary where ancient Indian clay-oven traditions meet bold Szechuan wok heat and European baking craft. Every recipe is calibrated with hand-ground spices, cold-pressed oils, and farm-fresh harvest.
-            </p>
-            <p className="text-sm text-[#AAA39A] leading-relaxed">
-              Whether you are sharing an intimate candlelit celebration or enjoying our express simulated gourmet delivery at home, we deliver good food that inspires a truly great mood.
-            </p>
+          <Reveal className="text-center mt-10">
+            <Link to="/gallery" className="btn-luxury-outline inline-flex">
+              <span>View Full Gallery</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </Reveal>
+        </div>
+      </section>
 
-            <div className="pt-2 flex flex-wrap gap-4">
-              <Link
-                to="/about"
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#D6A84F] to-[#B08332] text-[#0B0B0B] font-bold text-xs uppercase tracking-wider hover:brightness-110 transition-all shadow-md inline-flex items-center gap-2"
+      {/* ══════════════════════════════════════════════════════
+          8. TESTIMONIALS — CINEMATIC CAROUSEL
+         ══════════════════════════════════════════════════════ */}
+      <section className="py-24 sm:py-32 bg-[#0A0908] relative overflow-hidden">
+        {/* Ambient gold orb */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#D6A84F]/4 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="container-luxury relative z-10">
+          <Reveal className="section-header mb-16">
+            <span className="section-label">Guest Impressions</span>
+            <h2 className="section-title">Words From Our Guests</h2>
+            <p className="text-xs text-[#706050] mt-2">Identified sample testimonials — interactive prototype mode</p>
+            <div className="section-divider mt-4" />
+          </Reveal>
+
+          <div className="max-w-4xl mx-auto">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTestimonialIdx}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+                className="relative"
               >
-                <span>Read Our Full Story</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+                <div className="card-luxury p-8 sm:p-12 text-center">
+                  {/* Giant quote mark */}
+                  <div className="absolute top-6 left-6 font-luxury text-9xl text-[#D6A84F]/8 leading-none select-none pointer-events-none">
+                    "
+                  </div>
+
+                  <div className="flex justify-center gap-1 mb-6">
+                    {[...Array(TESTIMONIALS[activeTestimonialIdx].rating)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-[#D6A84F] text-[#D6A84F]" />
+                    ))}
+                  </div>
+
+                  <h3 className="font-luxury text-xl sm:text-2xl font-semibold text-[#F5F0E8] mb-4 italic">
+                    "{TESTIMONIALS[activeTestimonialIdx].title}"
+                  </h3>
+
+                  <p className="text-sm sm:text-base text-[#A09080] leading-relaxed max-w-2xl mx-auto italic mb-8">
+                    "{TESTIMONIALS[activeTestimonialIdx].comment}"
+                  </p>
+
+                  <div className="flex flex-col items-center gap-4">
+                    <img
+                      src={TESTIMONIALS[activeTestimonialIdx].avatar}
+                      alt={TESTIMONIALS[activeTestimonialIdx].author}
+                      className="w-14 h-14 rounded-full object-cover border-2 border-[#D6A84F]/40"
+                    />
+                    <div>
+                      <h4 className="font-semibold text-[#F5F0E8] text-sm">{TESTIMONIALS[activeTestimonialIdx].author}</h4>
+                      <p className="text-xs text-[#D6A84F] mt-0.5">{TESTIMONIALS[activeTestimonialIdx].role}</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Carousel Controls */}
+            <div className="flex items-center justify-center gap-6 mt-8">
               <button
-                onClick={openReservation}
-                className="px-6 py-3 rounded-xl bg-[#191612] border border-[#3A3326] hover:border-[#D6A84F] text-xs font-semibold text-[#F8F5EF] hover:bg-[#221E18] transition-all"
+                onClick={() => setActiveTestimonialIdx(p => (p - 1 + TESTIMONIALS.length) % TESTIMONIALS.length)}
+                className="w-10 h-10 rounded-luxury border border-[#D6A84F]/30 hover:border-[#D6A84F] hover:bg-[#D6A84F]/10 flex items-center justify-center text-[#A09080] hover:text-[#D6A84F] transition-all"
               >
-                Reserve Table Experience
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              <div className="flex gap-2">
+                {TESTIMONIALS.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveTestimonialIdx(i)}
+                    className={`transition-all duration-300 rounded-full ${i === activeTestimonialIdx ? 'w-8 h-2 bg-[#D6A84F]' : 'w-2 h-2 bg-[#D6A84F]/30 hover:bg-[#D6A84F]/60'}`}
+                  />
+                ))}
+              </div>
+
+              <button
+                onClick={() => setActiveTestimonialIdx(p => (p + 1) % TESTIMONIALS.length)}
+                className="w-10 h-10 rounded-luxury border border-[#D6A84F]/30 hover:border-[#D6A84F] hover:bg-[#D6A84F]/10 flex items-center justify-center text-[#A09080] hover:text-[#D6A84F] transition-all"
+              >
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 6. GALLERY PREVIEW */}
-      <section className="py-20 bg-[#100E0C] border-y border-[#262017]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D6A84F] block mb-2">
-              Atmosphere & Artistry
-            </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#F8F5EF]">
-              Gallery Preview
+      {/* ══════════════════════════════════════════════════════
+          9. VISIT US — SPLIT INFO + MAP
+         ══════════════════════════════════════════════════════ */}
+      <section className="py-24 sm:py-32 bg-[#080807] border-t border-[#D6A84F]/10">
+        <div className="container-luxury">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <Reveal direction="left">
+              <div className="space-y-8">
+                <div>
+                  <span className="section-label">Find Our Table</span>
+                  <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#F5F0E8] mt-3 leading-[1.15]">
+                    Visit <span className="gold-text">The Sizzle</span>
+                    <br />Restaurant
+                  </h2>
+                  <div className="section-divider-left mt-5" />
+                </div>
+
+                <div className="space-y-5">
+                  {[
+                    { icon: MapPin, title: 'Address', content: '42, Royal Promenade, Gold Crest Avenue, Opp Grand Orchid Palace, Mumbai – 400050' },
+                    { icon: Clock, title: 'Opening Hours', content: 'Mon–Thu: 12pm–11:30pm\nFri–Sun: 12pm–12:30am' },
+                    { icon: Phone, title: 'Direct Hotline (Demo)', content: '+91 98765 43210' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-start gap-4 group">
+                      <div className="w-11 h-11 rounded-luxury bg-[#D6A84F]/10 border border-[#D6A84F]/25 flex items-center justify-center flex-shrink-0 group-hover:border-[#D6A84F] group-hover:bg-[#D6A84F]/15 transition-all">
+                        <item.icon className="w-5 h-5 text-[#D6A84F]" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-semibold uppercase tracking-[0.15em] text-[#D6A84F] mb-1">{item.title}</h4>
+                        <p className="text-sm text-[#A09080] whitespace-pre-line leading-relaxed">{item.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap gap-4">
+                  <a
+                    href="https://maps.google.com/?q=Mumbai+Fine+Dining"
+                    target="_blank" rel="noreferrer"
+                    className="btn-luxury-primary"
+                  >
+                    <MapPin className="w-4 h-4" />
+                    <span>Get Directions</span>
+                  </a>
+                  <button onClick={openReservation} className="btn-luxury-outline">
+                    Book a Table
+                  </button>
+                </div>
+              </div>
+            </Reveal>
+
+            {/* Map Card */}
+            <Reveal direction="right" delay={0.2}>
+              <div className="relative h-[400px] rounded-luxury overflow-hidden border border-[#D6A84F]/20 bg-[#0F0E0C] flex flex-col items-center justify-center shadow-luxury">
+                <div className="absolute inset-0 bg-dot-grid opacity-30" />
+                <div className="relative text-center px-8 z-10">
+                  <div className="w-16 h-16 rounded-full bg-[#D6A84F]/15 border border-[#D6A84F]/40 flex items-center justify-center mx-auto mb-4 animate-pulse-gold">
+                    <MapPin className="w-8 h-8 text-[#D6A84F]" />
+                  </div>
+                  <h4 className="font-display text-xl font-bold text-[#F5F0E8] mb-1">The Sizzle Restaurant</h4>
+                  <p className="text-xs text-[#A09080] mb-6 max-w-xs mx-auto">Royal Promenade, Gold Crest Avenue, Mumbai – 400050</p>
+                  <a
+                    href="https://maps.google.com/?q=Mumbai+Fine+Dining"
+                    target="_blank" rel="noreferrer"
+                    className="btn-luxury-primary text-xs px-5 py-3 inline-flex"
+                  >
+                    Open in Google Maps
+                  </a>
+                </div>
+                {/* Gold corner accents */}
+                <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-[#D6A84F]/40" />
+                <div className="absolute top-0 right-0 w-12 h-12 border-t-2 border-r-2 border-[#D6A84F]/40" />
+                <div className="absolute bottom-0 left-0 w-12 h-12 border-b-2 border-l-2 border-[#D6A84F]/40" />
+                <div className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-[#D6A84F]/40" />
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════
+          10. CTA BANNER
+         ══════════════════════════════════════════════════════ */}
+      <section className="relative py-24 sm:py-32 overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1920&q=80"
+            alt="Dining"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-[#080807]/85" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#080807]/90 via-[#080807]/60 to-[#080807]/90" />
+        </div>
+        {/* Gold ambient glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#D6A84F]/8 blur-[80px] pointer-events-none rounded-full" />
+
+        <div className="container-luxury relative z-10 text-center">
+          <Reveal>
+            <span className="section-label">Your Experience Awaits</span>
+            <h2 className="font-luxury font-light text-[#F5F0E8] mt-4 mb-6 leading-[1.1]"
+              style={{ fontSize: 'clamp(36px, 6vw, 72px)' }}>
+              A Table Reserved<br />
+              <span className="gold-text font-semibold italic">Just for You</span>
             </h2>
-            <div className="w-16 h-[2px] bg-[#D6A84F] mx-auto mt-4" />
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-            {previewGallery.map((item) => (
-              <Link
-                key={item.id}
-                to="/gallery"
-                className="group relative aspect-[4/3] rounded-2xl overflow-hidden border border-[#2D261B] hover:border-[#D6A84F]/60 shadow-lg block"
-              >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                  <span className="text-[11px] text-[#D6A84F] uppercase tracking-wider font-semibold">
-                    {item.category}
-                  </span>
-                  <h4 className="font-serif text-sm sm:text-base font-bold text-[#F8F5EF]">
-                    {item.title}
-                  </h4>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          <div className="text-center mt-10">
-            <Link
-              to="/gallery"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#1A1813] border border-[#D6A84F]/40 text-[#D6A84F] text-xs font-bold uppercase tracking-wider hover:bg-[#D6A84F] hover:text-[#0B0B0B] transition-all shadow-md"
-            >
-              <span>Explore Full Photo Gallery</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 7. TESTIMONIALS CAROUSEL (Explicitly Identified Demo Mode) */}
-      <section className="py-24 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10">
-          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D6A84F] block mb-2">
-            Guest Impressions
-          </span>
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#F8F5EF]">
-            Words From Our Guests
-          </h2>
-          <p className="text-xs text-[#8A8376] mt-2">
-            Identified sample testimonials presented in interactive prototype mode.
-          </p>
-        </div>
-
-        <div className="relative bg-[#161411] border border-[#2F2920] rounded-3xl p-6 sm:p-10 shadow-2xl">
-          <Quote className="w-12 h-12 text-[#D6A84F]/20 absolute top-6 right-6" />
-
-          {/* Testimonial card */}
-          <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="flex justify-center gap-1 text-amber-400">
-              {[...Array(TESTIMONIALS[activeTestimonialIdx].rating)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-amber-400" />
-              ))}
-            </div>
-
-            <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#F8F5EF]">
-              "{TESTIMONIALS[activeTestimonialIdx].title}"
-            </h3>
-
-            <p className="text-sm sm:text-base text-[#AAA39A] leading-relaxed italic">
-              "{TESTIMONIALS[activeTestimonialIdx].comment}"
+            <div className="section-divider mb-6" />
+            <p className="text-sm text-[#A09080] max-w-xl mx-auto mb-10 leading-relaxed">
+              Whether celebrating life's milestones or simply indulging in a midweek luxury, our hosts are ready to curate an unforgettable evening.
             </p>
-
-            <div className="flex items-center justify-center gap-3 pt-2">
-              <img
-                src={TESTIMONIALS[activeTestimonialIdx].avatar}
-                alt={TESTIMONIALS[activeTestimonialIdx].author}
-                className="w-12 h-12 rounded-full object-cover border border-[#D6A84F]/40"
-              />
-              <div className="text-left">
-                <h4 className="text-sm font-bold text-[#F8F5EF]">
-                  {TESTIMONIALS[activeTestimonialIdx].author}
-                </h4>
-                <p className="text-xs text-[#D6A84F]">
-                  {TESTIMONIALS[activeTestimonialIdx].role}
-                </p>
-              </div>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <button onClick={openReservation} className="btn-luxury-primary w-full sm:w-auto">
+                <Sparkles className="w-4 h-4" />
+                <span>Book a Table Now</span>
+              </button>
+              <Link to="/menu" className="btn-luxury-outline w-full sm:w-auto">
+                <span>Explore Menu First</span>
+              </Link>
             </div>
-          </div>
-
-          {/* Carousel navigation controls */}
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-[#262118]">
-            <button
-              onClick={prevTestimonial}
-              className="p-2.5 rounded-xl bg-[#201D17] border border-[#352F24] hover:border-[#D6A84F] text-[#AAA39A] hover:text-[#F8F5EF] transition-all"
-              aria-label="Previous testimonial"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-
-            <div className="flex items-center gap-2">
-              {TESTIMONIALS.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActiveTestimonialIdx(i)}
-                  className={`h-2 rounded-full transition-all ${
-                    i === activeTestimonialIdx ? 'w-6 bg-[#D6A84F]' : 'w-2 bg-[#332E25]'
-                  }`}
-                  aria-label={`Jump to review ${i + 1}`}
-                />
-              ))}
-            </div>
-
-            <button
-              onClick={nextTestimonial}
-              className="p-2.5 rounded-xl bg-[#201D17] border border-[#352F24] hover:border-[#D6A84F] text-[#AAA39A] hover:text-[#F8F5EF] transition-all"
-              aria-label="Next testimonial"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* 8. VISIT US & LOCATION SECTION */}
-      <section className="py-20 bg-[#100E0C] border-t border-[#262017]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-            <div className="space-y-6">
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D6A84F] block">
-                Find Our Table
-              </span>
-              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#F8F5EF]">
-                Visit The Sizzle
-              </h2>
-              <p className="text-sm text-[#AAA39A] leading-relaxed">
-                Conveniently situated in the city's premier dining district. Join us for a celebratory dinner, leisurely lunch, or late-night dessert craving.
-              </p>
-
-              <div className="space-y-4 pt-2">
-                <div className="flex items-start gap-3">
-                  <div className="p-2.5 rounded-xl bg-[#1A1813] border border-[#D6A84F]/30 text-[#D6A84F]">
-                    <MapPin className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-semibold text-[#F8F5EF]">Address</h4>
-                    <p className="text-xs text-[#AAA39A] mt-0.5">
-                      {RESTAURANT_INFO.address.line1}, {RESTAURANT_INFO.address.landmark}, {RESTAURANT_INFO.address.city} - {RESTAURANT_INFO.address.pincode}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="p-2.5 rounded-xl bg-[#1A1813] border border-[#D6A84F]/30 text-[#D6A84F]">
-                    <Clock className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-semibold text-[#F8F5EF]">Opening Hours</h4>
-                    <p className="text-xs text-[#AAA39A] mt-0.5">
-                      Monday – Thursday: 12:00 PM – 11:30 PM <br />
-                      Friday – Sunday: 12:00 PM – 12:30 AM
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="p-2.5 rounded-xl bg-[#1A1813] border border-[#D6A84F]/30 text-[#D6A84F]">
-                    <Phone className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-semibold text-[#F8F5EF]">Direct Hotline (Demo)</h4>
-                    <p className="text-xs text-[#AAA39A] font-mono mt-0.5">
-                      {RESTAURANT_INFO.phone}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-4 flex flex-wrap gap-4">
-                <a
-                  href={RESTAURANT_INFO.address.googleMapsSearchUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#D6A84F] to-[#B08332] text-[#0B0B0B] font-bold text-xs uppercase tracking-wider hover:brightness-110 transition-all shadow-md inline-flex items-center gap-2"
-                >
-                  <MapPin className="w-4 h-4" />
-                  <span>Get Directions</span>
-                </a>
-                <button
-                  onClick={openReservation}
-                  className="px-6 py-3 rounded-xl bg-[#1A1813] border border-[#3A3326] hover:border-[#D6A84F] text-xs font-semibold text-[#F8F5EF] transition-all"
-                >
-                  Book a Table Now
-                </button>
-              </div>
-            </div>
-
-            {/* Map Placeholder Card */}
-            <div className="relative rounded-3xl overflow-hidden border border-[#2F2920] bg-[#171512] h-[360px] flex flex-col items-center justify-center p-6 text-center shadow-xl">
-              <div className="w-16 h-16 rounded-full bg-[#201D17] border border-[#D6A84F]/30 flex items-center justify-center text-[#D6A84F] mb-4">
-                <MapPin className="w-8 h-8" />
-              </div>
-              <h4 className="font-serif text-xl font-bold text-[#F8F5EF] mb-1">
-                The Sizzle Fine Dining
-              </h4>
-              <p className="text-xs text-[#AAA39A] max-w-sm mb-6">
-                Royal Promenade, Gold Crest Avenue, Mumbai
-              </p>
-              <a
-                href={RESTAURANT_INFO.address.googleMapsSearchUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="px-5 py-2.5 rounded-xl bg-[#211E18] hover:bg-[#D6A84F] hover:text-[#0B0B0B] text-xs font-semibold text-[#F8F5EF] border border-[#3A3326] transition-all"
-              >
-                Open in Google Maps
-              </a>
-            </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 

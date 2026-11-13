@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Heart, Plus, Eye, Star, Flame, Sparkles, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { formatCurrency } from '../../utils/formatters';
@@ -11,13 +12,14 @@ export const DishCard = ({ dish, onQuickView }) => {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const isFavorite = isInWishlist(dish.id);
   const [justAdded, setJustAdded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
     addToCart(dish, 1);
     setJustAdded(true);
-    setTimeout(() => setJustAdded(false), 1200);
+    setTimeout(() => setJustAdded(false), 1500);
   };
 
   const handleFavoriteClick = (e) => {
@@ -26,97 +28,133 @@ export const DishCard = ({ dish, onQuickView }) => {
     toggleWishlist(dish.id);
   };
 
-  const handleQuickViewClick = (e) => {
+  const handleQuickView = (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (onQuickView) onQuickView(dish);
   };
 
   return (
-    <div className="group relative bg-[#171512] border border-[#2B251B] hover:border-[#D6A84F]/50 rounded-2xl overflow-hidden shadow-lg transition-all duration-300 flex flex-col hover:-translate-y-1 hover:shadow-gold-sm">
-      {/* Dish Image Container */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-[#1D1A16]">
-        <img
+    <motion.div
+      className="relative bg-card-luxury border border-[#D6A84F]/12 rounded-luxury overflow-hidden flex flex-col"
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      whileHover={{ y: -6, boxShadow: '0 20px 50px -10px rgba(0,0,0,0.6), 0 0 0 1px rgba(214,168,79,0.2), 0 0 30px rgba(214,168,79,0.08)' }}
+      transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+    >
+      {/* Top gold line on hover */}
+      <motion.div
+        className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#D6A84F] to-transparent z-10"
+        animate={{ opacity: isHovered ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+      />
+
+      {/* Image Container */}
+      <div className="relative aspect-[4/3] overflow-hidden bg-[#1A1612]">
+        <motion.img
           src={dish.image}
           alt={dish.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover"
+          animate={{ scale: isHovered ? 1.07 : 1 }}
+          transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#171512] via-transparent to-black/40 opacity-80" />
 
-        {/* Top Badges */}
-        <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
-          <div className="flex items-center gap-1.5 pointer-events-auto">
-            <DietaryBadge isVeg={dish.isVeg} className="bg-black/60 p-1" />
+        {/* Image gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#161411]/80 via-transparent to-black/30" />
+
+        {/* Hover overlay */}
+        <motion.div
+          className="absolute inset-0 bg-[#D6A84F]/8"
+          animate={{ opacity: isHovered ? 1 : 0 }}
+          transition={{ duration: 0.3 }}
+        />
+
+        {/* Top badges */}
+        <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10">
+          <div className="flex items-center gap-1.5">
+            <DietaryBadge isVeg={dish.isVeg} className="bg-black/60 backdrop-blur-sm p-1" />
             {dish.chefSpecial && <SpecialBadge text="Chef Special" />}
           </div>
-
-          {/* Wishlist Button */}
-          <button
+          {/* Wishlist */}
+          <motion.button
             onClick={handleFavoriteClick}
-            aria-label={isFavorite ? `Remove ${dish.name} from favorites` : `Add ${dish.name} to favorites`}
-            className={`pointer-events-auto p-2 rounded-full backdrop-blur-md transition-all active:scale-90 ${
+            aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+            whileTap={{ scale: 0.85 }}
+            className={`w-8 h-8 rounded-luxury flex items-center justify-center backdrop-blur-md transition-all ${
               isFavorite
-                ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
-                : 'bg-black/50 text-[#AAA39A] hover:text-[#F8F5EF] border border-white/10 hover:border-[#D6A84F]/40'
+                ? 'bg-rose-500/25 text-rose-400 border border-rose-500/50'
+                : 'bg-black/50 text-[#A09080] hover:text-white border border-white/10 hover:border-[#D6A84F]/40'
             }`}
           >
-            <Heart className={`w-4 h-4 ${isFavorite ? 'fill-rose-400' : ''}`} />
-          </button>
+            <Heart className={`w-3.5 h-3.5 ${isFavorite ? 'fill-rose-400' : ''}`} />
+          </motion.button>
         </div>
 
-        {/* Quick View Button on Hover */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-[2px]">
-          <button
-            onClick={handleQuickViewClick}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#171512]/90 border border-[#D6A84F]/60 text-xs font-semibold text-[#F8F5EF] hover:bg-[#D6A84F] hover:text-[#0B0B0B] transition-all shadow-xl"
-          >
-            <Eye className="w-3.5 h-3.5" />
-            Quick Preview
-          </button>
-        </div>
+        {/* Quick view overlay */}
+        <AnimatePresence>
+          {isHovered && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 flex items-center justify-center z-10"
+            >
+              <motion.button
+                initial={{ scale: 0.8, y: 10 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.8, y: 10 }}
+                onClick={handleQuickView}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-luxury bg-[#161411]/90 border border-[#D6A84F]/50 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#F5F0E8] hover:bg-[#D6A84F] hover:text-[#080807] hover:border-[#D6A84F] transition-all shadow-luxury"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                Quick Preview
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Category & Rating Bar */}
-        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] text-[#AAA39A]">
-          <span className="capitalize font-medium tracking-wide px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md border border-white/10">
+        {/* Bottom info strip */}
+        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between z-10">
+          <span className="text-[9px] uppercase tracking-[0.15em] font-medium text-[#C8BEB0] px-2.5 py-1 rounded-luxury bg-black/60 backdrop-blur-sm border border-white/8">
             {dish.category.replace('-', ' ')}
           </span>
-          <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md border border-white/10 text-amber-400">
-            <Star className="w-3 h-3 fill-amber-400" />
-            <span className="font-bold text-[#F8F5EF]">{dish.rating}</span>
-            <span className="text-[10px] text-[#AAA39A] hidden sm:inline">(demo)</span>
+          <div className="flex items-center gap-1 px-2.5 py-1 rounded-luxury bg-black/60 backdrop-blur-sm border border-white/8">
+            <Star className="w-3 h-3 text-[#D6A84F] fill-[#D6A84F]" />
+            <span className="text-[11px] font-bold text-[#F5F0E8]">{dish.rating}</span>
+            <span className="text-[9px] text-[#706050]">(demo)</span>
           </div>
         </div>
       </div>
 
       {/* Dish Details */}
-      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
-        <div>
-          <div className="flex items-baseline justify-between gap-2 mb-1.5">
-            <Link
-              to={`/menu/${dish.slug}`}
-              className="font-serif text-lg font-bold text-[#F8F5EF] hover:text-[#D6A84F] transition-colors truncate"
-              title={dish.name}
-            >
-              {dish.name}
-            </Link>
-          </div>
-
-          <p className="text-xs text-[#AAA39A] line-clamp-2 leading-relaxed mb-3">
+      <div className="p-5 flex-1 flex flex-col">
+        <div className="mb-3">
+          <Link
+            to={`/menu/${dish.slug}`}
+            className="font-display text-lg font-bold text-[#F5F0E8] hover:text-[#D6A84F] transition-colors duration-300 leading-tight block mb-1 hover-underline-gold"
+          >
+            {dish.name}
+          </Link>
+          <p className="text-xs text-[#706050] line-clamp-2 leading-relaxed">
             {dish.description}
           </p>
-
-          <div className="flex items-center gap-2 mb-4">
-            <SpiceBadge level={dish.spiceLevel} />
-            <span className="text-[11px] text-[#888176]">⏱ {dish.prepTime}</span>
-          </div>
         </div>
 
-        {/* Price & Action */}
-        <div className="pt-3 border-t border-[#252018] flex items-center justify-between">
+        {/* Meta tags */}
+        <div className="flex items-center gap-2 mb-4">
+          <SpiceBadge level={dish.spiceLevel} />
+          <span className="text-[10px] text-[#706050] flex items-center gap-1">
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            {dish.prepTime}
+          </span>
+        </div>
+
+        {/* Price + Actions */}
+        <div className="mt-auto pt-4 border-t border-[#D6A84F]/10 flex items-center justify-between gap-3">
           <div>
-            <span className="text-[10px] text-[#888176] uppercase tracking-wider block">Price</span>
-            <span className="font-serif text-lg sm:text-xl font-bold text-[#D6A84F]">
+            <span className="text-[9px] uppercase tracking-[0.15em] text-[#706050] block">From</span>
+            <span className="font-luxury text-xl font-semibold text-[#D6A84F]">
               {formatCurrency(dish.price)}
             </span>
           </div>
@@ -124,35 +162,36 @@ export const DishCard = ({ dish, onQuickView }) => {
           <div className="flex items-center gap-2">
             <Link
               to={`/menu/${dish.slug}`}
-              className="text-xs text-[#AAA39A] hover:text-[#F8F5EF] px-2.5 py-1.5 rounded-lg hover:bg-[#221E17] transition-colors hidden sm:inline-block"
+              className="hidden sm:flex px-3 py-2 rounded-luxury text-[10px] text-[#A09080] hover:text-[#F5F0E8] border border-[#D6A84F]/15 hover:border-[#D6A84F]/40 transition-all uppercase tracking-[0.1em] font-medium"
             >
               Details
             </Link>
-
-            <button
+            <motion.button
               onClick={handleAddToCart}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-md active:scale-95 ${
+              whileTap={{ scale: 0.92 }}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-luxury text-[10px] font-bold uppercase tracking-[0.12em] transition-all shadow-sm ${
                 justAdded
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-gradient-to-r from-[#D6A84F] to-[#B08332] text-[#0B0B0B] hover:brightness-110'
+                  ? 'bg-emerald-700 text-white border border-emerald-600'
+                  : 'bg-gold-gradient text-[#080807] hover:shadow-gold-sm hover:brightness-110'
               }`}
-              aria-label={`Add ${dish.name} to order`}
             >
-              {justAdded ? (
-                <>
-                  <Check className="w-3.5 h-3.5" />
-                  <span>Added</span>
-                </>
-              ) : (
-                <>
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Add</span>
-                </>
-              )}
-            </button>
+              <AnimatePresence mode="wait">
+                {justAdded ? (
+                  <motion.div key="check" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} className="flex items-center gap-1.5">
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Added</span>
+                  </motion.div>
+                ) : (
+                  <motion.div key="add" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} className="flex items-center gap-1.5">
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.button>
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

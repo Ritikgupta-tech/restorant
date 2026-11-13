@@ -46,35 +46,38 @@ export const ReservationModal = () => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={closeReservation}
-          className="fixed inset-0 bg-black/85 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/90 backdrop-blur-md"
         />
 
         {/* Modal Window */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          initial={{ opacity: 0, scale: 0.96, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          transition={{ duration: 0.2 }}
-          className="relative w-full max-w-xl bg-[#131210] border border-[#D6A84F]/40 rounded-2xl shadow-2xl p-6 sm:p-8 overflow-hidden z-10 max-h-[92vh] overflow-y-auto"
+          exit={{ opacity: 0, scale: 0.96, y: 15 }}
+          transition={{ duration: 0.25 }}
+          className="relative w-full max-w-xl bg-[#0F0E0D] border border-[#D6A84F]/40 shadow-[0_20px_60px_rgba(0,0,0,0.9)] p-6 sm:p-8 overflow-hidden z-10 max-h-[92vh] overflow-y-auto scrollbar-none"
         >
+          {/* Gold accent line */}
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#D6A84F] to-transparent" />
+
           {/* Header */}
-          <div className="flex items-start justify-between border-b border-[#29251E] pb-4 mb-6">
+          <div className="flex items-start justify-between border-b border-[#221F1A] pb-4 mb-6">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#D6A84F]/10 border border-[#D6A84F]/30 text-[#D6A84F] text-[11px] font-semibold tracking-wider uppercase mb-2">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#D6A84F]/10 border border-[#D6A84F]/30 text-[#D6A84F] text-[10px] font-semibold tracking-[0.2em] uppercase mb-2">
                 <Sparkles className="w-3 h-3" />
-                Table Reservation Simulation
+                Table Reservation Concierge
               </div>
-              <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#F8F5EF]">
-                Reserve Your Table
+              <h3 className="font-luxury text-3xl font-light text-[#F5F0E8]">
+                Reserve Your Evening
               </h3>
-              <p className="text-xs text-[#AAA39A] mt-1">
-                Experience exceptional hospitality at The Sizzle Restaurant.
+              <p className="text-xs text-[#8A7E72] font-light mt-1">
+                Experience exceptional hospitality and cast-iron cuisine at The Sizzle.
               </p>
             </div>
 
             <button
               onClick={closeReservation}
-              className="text-[#AAA39A] hover:text-[#F8F5EF] p-2 hover:bg-[#201D17] rounded-lg transition-colors"
+              className="text-[#8A7E72] hover:text-[#F5F0E8] p-2 hover:bg-[#1A1814] transition-colors"
               aria-label="Close modal"
             >
               <X className="w-5 h-5" />
@@ -86,14 +89,14 @@ export const ReservationModal = () => {
             {/* Full Name & Phone */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-[#F8F5EF] mb-1.5">
+                <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#8A7E72] mb-1.5">
                   Full Name <span className="text-[#D6A84F]">*</span>
                 </label>
                 <input
                   type="text"
                   placeholder="e.g. Vikram Malhotra"
                   {...register('fullName')}
-                  className="w-full bg-[#1B1916] border border-[#332D23] focus:border-[#D6A84F] focus:outline-none rounded-xl px-3.5 py-2.5 text-sm text-[#F8F5EF] placeholder-[#666056] transition-colors"
+                  className="w-full bg-[#0A0908] border border-[#2A241C] focus:border-[#D6A84F] focus:outline-none px-4 py-2.5 text-xs sm:text-sm text-[#F5F0E8] placeholder-[#5A5247]"
                 />
                 {errors.fullName && (
                   <p className="text-red-400 text-xs mt-1">{errors.fullName.message}</p>
@@ -101,14 +104,14 @@ export const ReservationModal = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#F8F5EF] mb-1.5">
+                <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#8A7E72] mb-1.5">
                   Phone Number <span className="text-[#D6A84F]">*</span>
                 </label>
                 <input
                   type="tel"
-                  placeholder="10-digit mobile number"
+                  placeholder="10-digit number"
                   {...register('phone')}
-                  className="w-full bg-[#1B1916] border border-[#332D23] focus:border-[#D6A84F] focus:outline-none rounded-xl px-3.5 py-2.5 text-sm text-[#F8F5EF] placeholder-[#666056] transition-colors"
+                  className="w-full bg-[#0A0908] border border-[#2A241C] focus:border-[#D6A84F] focus:outline-none px-4 py-2.5 text-xs sm:text-sm text-[#F5F0E8] placeholder-[#5A5247]"
                 />
                 {errors.phone && (
                   <p className="text-red-400 text-xs mt-1">{errors.phone.message}</p>
@@ -118,14 +121,14 @@ export const ReservationModal = () => {
 
             {/* Email */}
             <div>
-              <label className="block text-xs font-semibold text-[#F8F5EF] mb-1.5">
+              <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#8A7E72] mb-1.5">
                 Email Address <span className="text-[#D6A84F]">*</span>
               </label>
               <input
                 type="email"
                 placeholder="you@example.com"
                 {...register('email')}
-                className="w-full bg-[#1B1916] border border-[#332D23] focus:border-[#D6A84F] focus:outline-none rounded-xl px-3.5 py-2.5 text-sm text-[#F8F5EF] placeholder-[#666056] transition-colors"
+                className="w-full bg-[#0A0908] border border-[#2A241C] focus:border-[#D6A84F] focus:outline-none px-4 py-2.5 text-xs sm:text-sm text-[#F5F0E8] placeholder-[#5A5247]"
               />
               {errors.email && (
                 <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>
@@ -135,38 +138,36 @@ export const ReservationModal = () => {
             {/* Date, Time, Guests */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-[#F8F5EF] mb-1.5">
+                <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#8A7E72] mb-1.5">
                   Date <span className="text-[#D6A84F]">*</span>
                 </label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    min={todayStr}
-                    {...register('date')}
-                    className="w-full bg-[#1B1916] border border-[#332D23] focus:border-[#D6A84F] focus:outline-none rounded-xl px-3 py-2 text-sm text-[#F8F5EF] transition-colors"
-                  />
-                </div>
+                <input
+                  type="date"
+                  min={todayStr}
+                  {...register('date')}
+                  className="w-full bg-[#0A0908] border border-[#2A241C] focus:border-[#D6A84F] focus:outline-none px-3 py-2 text-xs sm:text-sm text-[#F5F0E8]"
+                />
                 {errors.date && (
                   <p className="text-red-400 text-xs mt-1">{errors.date.message}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#F8F5EF] mb-1.5">
+                <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#8A7E72] mb-1.5">
                   Time Slot <span className="text-[#D6A84F]">*</span>
                 </label>
                 <select
                   {...register('time')}
-                  className="w-full bg-[#1B1916] border border-[#332D23] focus:border-[#D6A84F] focus:outline-none rounded-xl px-3 py-2 text-sm text-[#F8F5EF] transition-colors"
+                  className="w-full bg-[#0A0908] border border-[#2A241C] focus:border-[#D6A84F] focus:outline-none px-3 py-2 text-xs sm:text-sm text-[#F5F0E8] cursor-pointer"
                 >
-                  <option value="12:30">12:30 PM (Lunch)</option>
-                  <option value="13:30">01:30 PM (Lunch)</option>
-                  <option value="14:30">02:30 PM (Lunch)</option>
-                  <option value="19:00">07:00 PM (Dinner)</option>
-                  <option value="19:30">07:30 PM (Dinner)</option>
-                  <option value="20:30">08:30 PM (Dinner)</option>
-                  <option value="21:30">09:30 PM (Dinner)</option>
-                  <option value="22:30">10:30 PM (Late Dinner)</option>
+                  <option value="12:30">12:30 PM (Salon Lunch)</option>
+                  <option value="13:30">01:30 PM (Salon Lunch)</option>
+                  <option value="14:30">02:30 PM (Salon Lunch)</option>
+                  <option value="19:00">07:00 PM (Dinner Seating)</option>
+                  <option value="19:30">07:30 PM (Dinner Seating)</option>
+                  <option value="20:30">08:30 PM (Dinner Seating)</option>
+                  <option value="21:30">09:30 PM (Dinner Seating)</option>
+                  <option value="22:30">10:30 PM (Late Savor)</option>
                 </select>
                 {errors.time && (
                   <p className="text-red-400 text-xs mt-1">{errors.time.message}</p>
@@ -174,12 +175,12 @@ export const ReservationModal = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#F8F5EF] mb-1.5">
-                  Guests <span className="text-[#D6A84F]">*</span>
+                <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#8A7E72] mb-1.5">
+                  Party Size <span className="text-[#D6A84F]">*</span>
                 </label>
                 <select
                   {...register('guests')}
-                  className="w-full bg-[#1B1916] border border-[#332D23] focus:border-[#D6A84F] focus:outline-none rounded-xl px-3 py-2 text-sm text-[#F8F5EF] transition-colors"
+                  className="w-full bg-[#0A0908] border border-[#2A241C] focus:border-[#D6A84F] focus:outline-none px-3 py-2 text-xs sm:text-sm text-[#F5F0E8] cursor-pointer"
                 >
                   {[1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 16, 20].map((num) => (
                     <option key={num} value={num}>
@@ -195,19 +196,19 @@ export const ReservationModal = () => {
 
             {/* Seating preference */}
             <div>
-              <label className="block text-xs font-semibold text-[#F8F5EF] mb-1.5">
-                Seating Area
+              <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#8A7E72] mb-1.5">
+                Salon Ambience Preference
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[
                   { id: 'indoor', label: 'Main Hall' },
                   { id: 'terrace', label: 'Rooftop Terrace' },
-                  { id: 'private_salon', label: 'Private Salon' },
+                  { id: 'private_salon', label: 'Velvet Salon' },
                   { id: 'bar_lounge', label: 'Bar Lounge' },
                 ].map((area) => (
                   <label
                     key={area.id}
-                    className="flex items-center gap-2 p-2.5 rounded-xl bg-[#1B1916] border border-[#332D23] hover:border-[#D6A84F]/50 cursor-pointer text-xs"
+                    className="flex items-center gap-2 p-2.5 bg-[#0A0908] border border-[#2A241C] hover:border-[#D6A84F]/50 cursor-pointer text-xs"
                   >
                     <input
                       type="radio"
@@ -215,7 +216,7 @@ export const ReservationModal = () => {
                       {...register('seatingArea')}
                       className="accent-[#D6A84F]"
                     />
-                    <span className="text-[#AAA39A]">{area.label}</span>
+                    <span className="text-[#A09585] text-[11px]">{area.label}</span>
                   </label>
                 ))}
               </div>
@@ -223,14 +224,14 @@ export const ReservationModal = () => {
 
             {/* Special Requests */}
             <div>
-              <label className="block text-xs font-semibold text-[#F8F5EF] mb-1.5">
-                Special Requests & Dietary Requirements (Optional)
+              <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#8A7E72] mb-1.5">
+                Special Celebrations / Dietary Notes (Optional)
               </label>
               <textarea
                 rows={2}
-                placeholder="Anniversary, birthday cake arrangement, window table, wheelchair access..."
+                placeholder="Anniversary celebration, bespoke floral centerpiece, window seating, allergies..."
                 {...register('specialRequests')}
-                className="w-full bg-[#1B1916] border border-[#332D23] focus:border-[#D6A84F] focus:outline-none rounded-xl p-3 text-sm text-[#F8F5EF] placeholder-[#666056] transition-colors"
+                className="w-full bg-[#0A0908] border border-[#2A241C] focus:border-[#D6A84F] focus:outline-none p-3 text-xs sm:text-sm text-[#F5F0E8] placeholder-[#5A5247]"
               />
               {errors.specialRequests && (
                 <p className="text-red-400 text-xs mt-1">{errors.specialRequests.message}</p>
@@ -238,7 +239,7 @@ export const ReservationModal = () => {
             </div>
 
             {/* Demo Notice */}
-            <div className="p-3 rounded-xl bg-[#181613] border border-[#D6A84F]/20 text-[11px] text-[#AAA39A]">
+            <div className="p-3 bg-[#0A0908] border border-[#221F1A] text-[11px] text-[#6A6258] font-light">
               <span className="text-[#D6A84F] font-semibold">Demo Notice:</span> Submitting this form tests the frontend reservation flow. No real table booking is submitted to a live restaurant host.
             </div>
 
@@ -247,14 +248,14 @@ export const ReservationModal = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#D6A84F] to-[#B08332] text-[#0B0B0B] font-bold text-sm tracking-wide uppercase hover:brightness-110 active:scale-[0.99] transition-all shadow-lg flex items-center justify-center gap-2"
+                className="btn-luxury-primary w-full py-4 text-xs tracking-[0.2em] flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
-                  <span>Processing Reservation...</span>
+                  <span>Securing Reservation...</span>
                 ) : (
                   <>
                     <span>Confirm Table Reservation</span>
-                    <Sparkles className="w-4 h-4" />
+                    <Sparkles className="w-3.5 h-3.5" />
                   </>
                 )}
               </button>

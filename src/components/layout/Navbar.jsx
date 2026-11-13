@@ -1,203 +1,276 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  UtensilsCrossed,
-  ShoppingBag,
-  Heart,
-  Search,
-  Menu as MenuIcon,
-  X,
-  Calendar,
-  Sparkles,
+  UtensilsCrossed, ShoppingBag, Heart, Search, Menu as MenuIcon, X, Calendar, ChevronDown,
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useReservation } from '../../context/ReservationContext';
+
+const navLinks = [
+  { name: 'Home', path: '/' },
+  { name: 'Menu', path: '/menu' },
+  { name: 'About', path: '/about' },
+  { name: 'Gallery', path: '/gallery' },
+  { name: 'Contact', path: '/contact' },
+];
 
 export const Navbar = ({ onOpenSearch }) => {
   const { totalItemsCount, openCart } = useCart();
   const { wishlistCount, openWishlist } = useWishlist();
   const { openReservation } = useReservation();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 30);
+      const y = window.scrollY;
+      setIsScrolled(y > 60);
+      const docH = document.body.scrollHeight - window.innerHeight;
+      setScrollProgress(docH > 0 ? (y / docH) * 100 : 0);
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Menu', path: '/menu' },
-    { name: 'About', path: '/about' },
-    { name: 'Gallery', path: '/gallery' },
-    { name: 'Contact', path: '/contact' },
-  ];
+  // Lock body scroll when mobile menu open
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
 
   return (
     <>
+      {/* Reading Progress Bar */}
+      <div className="fixed top-0 left-0 right-0 z-[60] h-[2px]">
+        <div
+          className="h-full bg-gradient-to-r from-[#D6A84F] via-[#F3DC9B] to-[#D6A84F] transition-all duration-100"
+          style={{ width: `${scrollProgress}%` }}
+        />
+      </div>
+
+      {/* Main Navigation Header */}
       <header
-        className={`sticky top-0 z-40 transition-all duration-300 ${
+        className={`sticky top-0 z-50 w-full transition-all duration-500 ${
           isScrolled
-            ? 'bg-[#0B0B0B]/95 backdrop-blur-md border-b border-[#D6A84F]/25 shadow-2xl py-3'
-            : 'bg-gradient-to-b from-[#0B0B0B]/90 via-[#0B0B0B]/70 to-transparent py-4'
+            ? 'bg-[#080807]/96 backdrop-blur-2xl border-b border-[#D6A84F]/15 shadow-[0_4px_30px_rgba(0,0,0,0.5)]'
+            : 'bg-transparent border-b border-transparent'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-4">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12">
+          <div className="flex items-center justify-between h-16 sm:h-20">
+
             {/* Brand Logo */}
-            <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D6A84F] to-[#8C6219] p-[1px] shadow-gold-sm">
-                <div className="w-full h-full bg-[#110F0B] rounded-[11px] flex items-center justify-center group-hover:bg-[#18150E] transition-colors">
-                  <UtensilsCrossed className="w-5 h-5 text-[#D6A84F] group-hover:rotate-12 transition-transform duration-300" />
+            <Link to="/" className="flex items-center gap-3 group flex-shrink-0" onClick={() => setMobileOpen(false)}>
+              {/* Logo mark */}
+              <div className="relative w-9 h-9 sm:w-10 sm:h-10">
+                <div className="absolute inset-0 rounded-luxury bg-gradient-to-br from-[#D6A84F] to-[#7A5A1E] p-[1px]">
+                  <div className="w-full h-full rounded-luxury bg-[#080807] flex items-center justify-center group-hover:bg-[#111009] transition-colors">
+                    <UtensilsCrossed className="w-4 h-4 sm:w-5 sm:h-5 text-[#D6A84F] transition-transform duration-500 group-hover:rotate-12" />
+                  </div>
                 </div>
               </div>
-              <div className="flex flex-col">
-                <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-[#F8F5EF] leading-tight">
+              {/* Brand text */}
+              <div className="hidden xs:flex flex-col leading-none">
+                <span className="font-luxury text-lg sm:text-xl font-semibold text-[#F5F0E8] tracking-tight">
                   The Sizzle
                 </span>
-                <span className="text-[10px] uppercase tracking-[0.25em] text-[#D6A84F] font-medium">
+                <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] text-[#D6A84F] font-medium">
                   Restaurant & Lounge
                 </span>
               </div>
             </Link>
 
-            {/* Desktop Navigation Links */}
+            {/* Desktop Nav Links */}
             <nav className="hidden lg:flex items-center gap-8">
               {navLinks.map((link) => (
                 <NavLink
                   key={link.name}
                   to={link.path}
                   className={({ isActive }) =>
-                    `text-xs uppercase tracking-wider font-medium transition-all relative py-1 ${
-                      isActive
-                        ? 'text-[#D6A84F] font-semibold'
-                        : 'text-[#AAA39A] hover:text-[#F8F5EF]'
+                    `relative text-[11px] uppercase tracking-[0.18em] font-medium transition-all duration-300 py-1 hover-underline-gold ${
+                      isActive ? 'text-[#D6A84F]' : 'text-[#A09080] hover:text-[#F5F0E8]'
                     }`
                   }
-                >
-                  {({ isActive }) => (
-                    <>
-                      {link.name}
-                      {isActive && (
-                        <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#D6A84F] to-transparent" />
-                      )}
-                    </>
-                  )}
-                </NavLink>
+                />
               ))}
             </nav>
 
-            {/* Actions: Search, Wishlist, Cart, Book Table */}
-            <div className="flex items-center gap-2 sm:gap-3">
-              {/* Search Trigger */}
+            {/* Right: Icon Actions */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              {/* Search */}
               <button
-                type="button"
                 onClick={onOpenSearch}
                 aria-label="Search dishes"
-                className="p-2 sm:p-2.5 rounded-xl text-[#AAA39A] hover:text-[#F8F5EF] hover:bg-[#1A1814] border border-transparent hover:border-[#332D22] transition-colors"
+                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-luxury text-[#A09080] hover:text-[#D6A84F] hover:bg-[#D6A84F]/8 border border-transparent hover:border-[#D6A84F]/25 transition-all duration-300"
               >
-                <Search className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Search className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
               </button>
 
-              {/* Wishlist Button */}
+              {/* Wishlist */}
               <button
-                type="button"
                 onClick={openWishlist}
-                aria-label="Wishlist"
-                className="relative p-2 sm:p-2.5 rounded-xl text-[#AAA39A] hover:text-[#F8F5EF] hover:bg-[#1A1814] border border-transparent hover:border-[#332D22] transition-colors"
+                aria-label="Open Wishlist"
+                className="relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-luxury text-[#A09080] hover:text-[#D6A84F] hover:bg-[#D6A84F]/8 border border-transparent hover:border-[#D6A84F]/25 transition-all duration-300"
               >
-                <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Heart className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
                 {wishlistCount > 0 && (
-                  <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-600 text-white text-[10px] font-bold flex items-center justify-center animate-pulse">
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-rose-600 text-white text-[9px] font-bold flex items-center justify-center"
+                  >
                     {wishlistCount}
-                  </span>
+                  </motion.span>
                 )}
               </button>
 
-              {/* Cart Drawer Trigger */}
+              {/* Cart */}
               <button
-                type="button"
                 onClick={openCart}
                 aria-label="Open Cart"
-                className="relative p-2 sm:p-2.5 rounded-xl text-[#AAA39A] hover:text-[#F8F5EF] hover:bg-[#1A1814] border border-transparent hover:border-[#332D22] transition-colors"
+                className="relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-luxury text-[#D6A84F] hover:bg-[#D6A84F]/8 border border-transparent hover:border-[#D6A84F]/30 transition-all duration-300"
               >
-                <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-[#D6A84F]" />
-                {totalItemsCount > 0 && (
-                  <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#D6A84F] text-[#0B0B0B] text-[10px] font-bold flex items-center justify-center">
-                    {totalItemsCount}
-                  </span>
-                )}
+                <ShoppingBag className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+                <AnimatePresence>
+                  {totalItemsCount > 0 && (
+                    <motion.span
+                      key="cart-count"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#D6A84F] text-[#080807] text-[9px] font-bold flex items-center justify-center"
+                    >
+                      {totalItemsCount}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </button>
 
-              {/* Book a Table Desktop CTA */}
+              {/* Book a Table — Desktop Only */}
               <button
-                type="button"
                 onClick={openReservation}
-                className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#D6A84F] to-[#B08332] text-[#0B0B0B] text-xs font-bold uppercase tracking-wider hover:brightness-110 active:scale-[0.98] transition-all shadow-md ml-1"
+                className="hidden sm:flex btn-luxury-primary ml-2 py-2.5 px-5 text-[10px]"
               >
                 <Calendar className="w-3.5 h-3.5" />
                 <span>Book a Table</span>
               </button>
 
-              {/* Mobile Menu Hamburger */}
+              {/* Mobile Hamburger */}
               <button
-                type="button"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label="Toggle navigation menu"
-                className="lg:hidden p-2 text-[#AAA39A] hover:text-[#F8F5EF] rounded-xl hover:bg-[#1A1814]"
+                onClick={() => setMobileOpen(!mobileOpen)}
+                aria-label="Toggle mobile menu"
+                className="lg:hidden w-9 h-9 flex items-center justify-center rounded-luxury text-[#A09080] hover:text-[#F5F0E8] hover:bg-[#D6A84F]/8 border border-transparent hover:border-[#D6A84F]/20 transition-all ml-1"
               >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
+                <AnimatePresence mode="wait">
+                  {mobileOpen ? (
+                    <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                      <X className="w-5 h-5" />
+                    </motion.div>
+                  ) : (
+                    <motion.div key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                      <MenuIcon className="w-5 h-5" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </button>
             </div>
           </div>
         </div>
-
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden border-b border-[#D6A84F]/30 bg-[#110F0C] px-5 py-6 space-y-4">
-            <nav className="flex flex-col space-y-3">
-              {navLinks.map((link) => (
-                <NavLink
-                  key={link.name}
-                  to={link.path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={({ isActive }) =>
-                    `text-sm uppercase tracking-wider font-semibold py-2 px-3 rounded-lg transition-colors ${
-                      isActive
-                        ? 'bg-[#D6A84F]/15 text-[#D6A84F] border border-[#D6A84F]/30'
-                        : 'text-[#AAA39A] hover:text-[#F8F5EF] hover:bg-[#1A1713]'
-                    }`
-                  }
-                >
-                  {link.name}
-                </NavLink>
-              ))}
-            </nav>
-
-            <div className="pt-3 border-t border-[#29241B] flex flex-col gap-2.5">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  openReservation();
-                }}
-                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#D6A84F] to-[#B08332] text-[#0B0B0B] text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all flex items-center justify-center gap-2"
-              >
-                <Calendar className="w-4 h-4" />
-                <span>Book a Table</span>
-              </button>
-
-              <div className="flex items-center justify-between text-xs text-[#AAA39A] px-2 pt-2">
-                <span>Direct Hotline:</span>
-                <span className="text-[#D6A84F] font-mono">+91 98765 43210</span>
-              </div>
-            </div>
-          </div>
-        )}
       </header>
+
+      {/* Mobile Full-Screen Menu */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-40 lg:hidden"
+          >
+            {/* Backdrop */}
+            <motion.div
+              className="absolute inset-0 bg-[#080807]/98 backdrop-blur-2xl"
+              onClick={() => setMobileOpen(false)}
+            />
+
+            {/* Menu panel */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'tween', duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="absolute top-0 right-0 bottom-0 w-full max-w-sm bg-[#0C0B09] border-l border-[#D6A84F]/15 flex flex-col"
+            >
+              {/* Mobile menu header */}
+              <div className="flex items-center justify-between p-6 border-b border-[#D6A84F]/10">
+                <div className="font-luxury text-xl text-[#F5F0E8]">The Sizzle</div>
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  className="w-9 h-9 flex items-center justify-center rounded-luxury border border-[#D6A84F]/25 text-[#A09080] hover:text-[#D6A84F]"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Nav Links */}
+              <div className="flex-1 overflow-y-auto py-6 px-6 space-y-1">
+                {navLinks.map((link, idx) => (
+                  <motion.div
+                    key={link.name}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.08, duration: 0.4 }}
+                  >
+                    <NavLink
+                      to={link.path}
+                      onClick={() => setMobileOpen(false)}
+                      className={({ isActive }) =>
+                        `flex items-center justify-between py-4 border-b border-[#D6A84F]/8 group transition-all ${
+                          isActive ? 'text-[#D6A84F]' : 'text-[#A09080] hover:text-[#F5F0E8]'
+                        }`
+                      }
+                    >
+                      {({ isActive }) => (
+                        <>
+                          <span className="font-luxury text-2xl font-light">{link.name}</span>
+                          <ArrowRight className={`w-4 h-4 transition-all ${isActive ? 'text-[#D6A84F]' : 'opacity-0 group-hover:opacity-100'}`} />
+                        </>
+                      )}
+                    </NavLink>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Mobile Footer Actions */}
+              <div className="p-6 border-t border-[#D6A84F]/10 space-y-3">
+                <button
+                  onClick={() => { setMobileOpen(false); openReservation(); }}
+                  className="btn-luxury-primary w-full"
+                >
+                  <Calendar className="w-4 h-4" />
+                  <span>Book a Table</span>
+                </button>
+                <div className="flex items-center justify-center gap-2 text-[10px] text-[#706050]">
+                  <span className="font-mono">+91 98765 43210</span>
+                  <span>|</span>
+                  <span>12pm–11:30pm Daily</span>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };
+
+// Need ArrowRight locally
+const ArrowRight = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+  </svg>
+);

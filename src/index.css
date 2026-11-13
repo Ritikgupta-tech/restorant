@@ -2,57 +2,508 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   THE SIZZLE RESTAURANT — PREMIUM LUXURY GLOBAL STYLES
+   Reference: Nobu, Gaggan Anand, Zuma Restaurant digital UX
+   ============================================================ */
+
 :root {
   color-scheme: dark;
+  --gold: #D6A84F;
+  --gold-light: #F3DC9B;
+  --gold-dark: #A87A29;
+  --gold-muted: rgba(214,168,79,0.15);
+  --amber: #F59E0B;
+  --bg-main: #080807;
+  --bg-secondary: #0F0E0C;
+  --bg-card: #161411;
+  --bg-elevated: #1C1916;
+  --text-primary: #F5F0E8;
+  --text-muted: #A09080;
+  --border-gold: rgba(214, 168, 79, 0.2);
+}
+
+/* ---- RESET & BASE ---- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
   margin: 0;
-  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background-color: #0B0B0B;
-  color: #F8F5EF;
+  font-family: 'Poppins', system-ui, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
   overflow-x: hidden;
+  letter-spacing: 0.01em;
+  line-height: 1.65;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #0B0B0B;
-}
+/* ---- CUSTOM SCROLLBAR ---- */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-main); }
 ::-webkit-scrollbar-thumb {
-  background: #2D271D;
-  border-radius: 4px;
-  border: 1px solid rgba(214, 168, 79, 0.2);
+  background: linear-gradient(to bottom, #D6A84F, #7A5A1E);
+  border-radius: 10px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #D6A84F;
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+/* ---- SELECTION ---- */
+::selection {
+  background: rgba(214, 168, 79, 0.3);
+  color: #F5F0E8;
 }
 
-/* Utility classes */
+/* ============================================================
+   TYPOGRAPHY SYSTEM
+   ============================================================ */
+.font-luxury { font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif; }
+.font-display { font-family: 'Playfair Display', Georgia, serif; }
+
+/* ============================================================
+   GOLD GRADIENT SYSTEM
+   ============================================================ */
+.gold-text {
+  background: linear-gradient(135deg, #FFF0D0 0%, #E8C170 35%, #D6A84F 60%, #B08332 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 .gold-gradient-text {
   background: linear-gradient(135deg, #FFF0D0 0%, #D6A84F 50%, #B08332 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.gold-gradient-bg {
+.gold-shimmer-text {
+  background: linear-gradient(90deg, #B08332 0%, #E8C170 25%, #FFF0D0 50%, #E8C170 75%, #B08332 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ============================================================
+   AMBIENT GLOW & BORDER EFFECTS
+   ============================================================ */
+.gold-glow { box-shadow: 0 0 30px rgba(214, 168, 79, 0.25), 0 0 60px rgba(214, 168, 79, 0.1); }
+.gold-glow-sm { box-shadow: 0 0 15px rgba(214, 168, 79, 0.2); }
+.gold-glow-inset { box-shadow: inset 0 0 20px rgba(214, 168, 79, 0.08); }
+
+.luxury-border {
+  border: 1px solid rgba(214, 168, 79, 0.25);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+.luxury-border:hover {
+  border-color: rgba(214, 168, 79, 0.6);
+  box-shadow: 0 0 25px rgba(214, 168, 79, 0.15);
+}
+
+/* ============================================================
+   BACKGROUND PATTERNS & TEXTURES
+   ============================================================ */
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+.bg-dot-grid {
+  background-image: radial-gradient(circle, rgba(214, 168, 79, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.bg-luxury-gradient {
+  background: radial-gradient(ellipse at top, rgba(214,168,79,0.06) 0%, transparent 60%),
+              radial-gradient(ellipse at bottom-right, rgba(185,130,50,0.04) 0%, transparent 50%),
+              #080807;
+}
+
+.bg-card-luxury {
+  background: linear-gradient(135deg, #1C1916 0%, #161411 50%, #1A1714 100%);
+}
+
+/* ============================================================
+   SECTION SEPARATORS
+   ============================================================ */
+.section-divider {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #D6A84F, transparent);
+  margin: 0 auto;
+}
+
+.section-divider-left {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #D6A84F, transparent);
+}
+
+/* ============================================================
+   BUTTON SYSTEM
+   ============================================================ */
+.btn-luxury-primary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 32px;
   background: linear-gradient(135deg, #D6A84F 0%, #B08332 100%);
-}
-
-.gold-border-glow {
-  border: 1px solid rgba(214, 168, 79, 0.3);
+  color: #0B0B0B;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  overflow: hidden;
   transition: all 0.3s ease;
 }
 
-.gold-border-glow:hover {
-  border-color: rgba(214, 168, 79, 0.7);
-  box-shadow: 0 0 20px rgba(214, 168, 79, 0.2);
+.btn-luxury-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.bg-pattern {
-  background-color: #0B0B0B;
-  background-image: radial-gradient(rgba(214, 168, 79, 0.04) 1px, transparent 1px);
-  background-size: 32px 32px;
+.btn-luxury-primary:hover {
+  box-shadow: 0 8px 25px rgba(214, 168, 79, 0.4), 0 2px 8px rgba(214, 168, 79, 0.3);
+  transform: translateY(-1px);
+}
+.btn-luxury-primary:hover::before { opacity: 1; }
+.btn-luxury-primary:active { transform: translateY(0); }
+
+.btn-luxury-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 30px;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border: 1px solid rgba(214, 168, 79, 0.4);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(8px);
+}
+
+.btn-luxury-outline:hover {
+  background: rgba(214, 168, 79, 0.08);
+  border-color: rgba(214, 168, 79, 0.8);
+  color: #D6A84F;
+  box-shadow: 0 0 20px rgba(214, 168, 79, 0.15);
+}
+
+/* ============================================================
+   CARD SYSTEM
+   ============================================================ */
+.card-luxury {
+  background: linear-gradient(145deg, #1C1916 0%, #141210 100%);
+  border: 1px solid rgba(214, 168, 79, 0.15);
+  border-radius: 2px;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-luxury::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(214, 168, 79, 0.4), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.card-luxury:hover {
+  border-color: rgba(214, 168, 79, 0.4);
+  box-shadow: 0 20px 50px -10px rgba(0,0,0,0.6), 0 0 0 1px rgba(214, 168, 79, 0.1), 0 0 30px rgba(214, 168, 79, 0.08);
+  transform: translateY(-4px);
+}
+.card-luxury:hover::before { opacity: 1; }
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+
+/* Entrance Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Ambient Particle Float */
+@keyframes floatParticle {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+  25% { transform: translateY(-15px) rotate(45deg); opacity: 0.6; }
+  50% { transform: translateY(-25px) rotate(90deg); opacity: 0.4; }
+  75% { transform: translateY(-10px) rotate(135deg); opacity: 0.7; }
+}
+
+/* Pulse Glow */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 10px rgba(214, 168, 79, 0.2); }
+  50% { box-shadow: 0 0 25px rgba(214, 168, 79, 0.5), 0 0 50px rgba(214, 168, 79, 0.2); }
+}
+
+/* Rotating Border */
+@keyframes rotateBorder {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Flicker - for candle/fire effects */
+@keyframes flicker {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(0.98); }
+}
+
+/* Number counter pulse */
+@keyframes countPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+/* Horizontal marquee scroll */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Line draw animation */
+@keyframes drawLine {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* Image reveal wipe */
+@keyframes revealRight {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0% 0 0); }
+}
+
+/* Utility animation classes */
+.animate-fade-up { animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+.animate-fade-left { animation: fadeInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+.animate-fade-right { animation: fadeInRight 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+.animate-scale-in { animation: scaleIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+.animate-flicker { animation: flicker 3s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulseGlow 2.5s ease-in-out infinite; }
+.animate-marquee { animation: marquee 25s linear infinite; }
+
+/* Delay utilities */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+.delay-600 { animation-delay: 600ms; }
+.delay-700 { animation-delay: 700ms; }
+
+/* ============================================================
+   SPECIAL EFFECTS
+   ============================================================ */
+
+/* Luxury Hover Line Effect */
+.hover-underline-gold {
+  position: relative;
+}
+.hover-underline-gold::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, #D6A84F, #F3DC9B);
+  transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.hover-underline-gold:hover::after { width: 100%; }
+
+/* Image Overlay hover */
+.img-overlay-hover {
+  position: relative;
+  overflow: hidden;
+}
+.img-overlay-hover img {
+  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.img-overlay-hover:hover img { transform: scale(1.08); }
+
+/* Glass Card Effect */
+.glass-card {
+  background: rgba(22, 20, 17, 0.7);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(214, 168, 79, 0.15);
+}
+
+/* Number/Stat badges */
+.stat-counter {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+/* Input premium styling */
+.input-luxury {
+  background: rgba(22, 20, 17, 0.8);
+  border: 1px solid rgba(214, 168, 79, 0.2);
+  border-radius: 2px;
+  color: #F5F0E8;
+  padding: 14px 18px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  transition: all 0.3s ease;
+  outline: none;
+  width: 100%;
+}
+
+.input-luxury::placeholder { color: rgba(160, 144, 128, 0.6); }
+
+.input-luxury:focus {
+  border-color: rgba(214, 168, 79, 0.6);
+  background: rgba(26, 23, 18, 0.9);
+  box-shadow: 0 0 0 3px rgba(214, 168, 79, 0.08), 0 0 20px rgba(214, 168, 79, 0.1);
+}
+
+/* Premium badge */
+.badge-luxury {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: linear-gradient(135deg, rgba(214,168,79,0.12) 0%, rgba(214,168,79,0.06) 100%);
+  border: 1px solid rgba(214, 168, 79, 0.3);
+  color: #D6A84F;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border-radius: 100px;
+}
+
+/* ============================================================
+   SECTION LAYOUT HELPERS
+   ============================================================ */
+.section-header {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 60px;
+}
+
+.section-label {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #D6A84F;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 700;
+  color: #F5F0E8;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+
+.section-subtitle {
+  font-size: 14px;
+  color: rgba(160, 144, 128, 0.9);
+  line-height: 1.8;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* ============================================================
+   RESPONSIVE HELPERS
+   ============================================================ */
+.container-luxury {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@media (min-width: 640px) {
+  .container-luxury { padding: 0 32px; }
+}
+@media (min-width: 1024px) {
+  .container-luxury { padding: 0 48px; }
+}
+@media (min-width: 1400px) {
+  .container-luxury { padding: 0 64px; }
+}
+
+/* ============================================================
+   TOAST REFINEMENTS
+   ============================================================ */
+.toast-luxury {
+  background: linear-gradient(135deg, rgba(22,20,17,0.98) 0%, rgba(28,25,20,0.98) 100%);
+  border: 1px solid rgba(214, 168, 79, 0.3);
+  box-shadow: 0 20px 50px -10px rgba(0,0,0,0.8), 0 0 0 1px rgba(214,168,79,0.1);
+  backdrop-filter: blur(20px);
+}
+
+/* ============================================================
+   PRINT STYLES
+   ============================================================ */
+@media print {
+  body { background: white; color: black; }
+  .no-print { display: none; }
+}
+
+/* ============================================================
+   REDUCED MOTION PREFERENCE
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

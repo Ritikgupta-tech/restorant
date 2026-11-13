@@ -11,11 +11,13 @@ import {
   Calendar,
   MessageSquare,
   Sparkles,
+  ArrowRight,
 } from 'lucide-react';
 import { RESTAURANT_INFO } from '../data/restaurantInfo';
 import { contactSchema } from '../utils/validationSchemas';
 import { useReservation } from '../context/ReservationContext';
 import { useToast } from '../context/ToastContext';
+import { Reveal } from '../components/common/ScrollReveal';
 
 export const ContactPage = () => {
   const { openReservation } = useReservation();
@@ -39,44 +41,44 @@ export const ContactPage = () => {
   });
 
   const onSubmit = (data) => {
-    // Simulated contact inquiry
     setSubmitted(true);
-    addToast('Message received! Our team will respond shortly (Demo)', 'success');
+    addToast('Inquiry received! Our concierge will connect with you shortly (Demo)', 'success');
     reset();
     setTimeout(() => setSubmitted(false), 5000);
   };
 
   return (
-    <div className="py-12 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+    <div className="py-12 sm:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 sm:space-y-24">
       {/* Title */}
-      <div className="text-center max-w-3xl mx-auto">
-        <span className="text-xs font-semibold uppercase tracking-[0.25em] text-[#D6A84F] block mb-2">
-          Connect With Us
-        </span>
-        <h1 className="font-serif text-3xl sm:text-5xl font-bold text-[#F8F5EF] mb-3">
-          Contact & Location
+      <Reveal className="text-center max-w-3xl mx-auto">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D6A84F]/10 border border-[#D6A84F]/30 text-[#D6A84F] text-[11px] font-semibold uppercase tracking-[0.25em] mb-4">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>Concierge & Inquiries</span>
+        </div>
+        <h1 className="font-luxury text-4xl sm:text-6xl md:text-7xl font-light text-[#F5F0E8] tracking-wide mb-4">
+          Connect With <span className="italic font-normal text-gradient-gold">The Sizzle</span>
         </h1>
-        <p className="text-sm text-[#AAA39A] leading-relaxed">
-          Have an inquiry regarding private dining, bespoke catering, or table bookings? We're at your service.
+        <p className="text-sm sm:text-base text-[#A09080] font-light leading-relaxed max-w-2xl mx-auto">
+          Private dining salons, bespoke banquets, or culinary inquiries — our hospitality team is dedicated to curating your memorable evening.
         </p>
-      </div>
+      </Reveal>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
         {/* Left Column: Contact Cards & Operating Hours */}
-        <div className="space-y-6">
-          <div className="bg-[#14120E] border border-[#2B251B] rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
-            <h2 className="font-serif text-2xl font-bold text-[#F8F5EF] border-b border-[#252018] pb-4">
-              Restaurant Information
+        <Reveal className="space-y-6">
+          <div className="bg-[#12100E] border border-[#26221B] p-6 sm:p-8 shadow-[0_15px_40px_rgba(0,0,0,0.6)] space-y-6">
+            <h2 className="font-luxury text-2xl sm:text-3xl font-light text-[#F5F0E8] border-b border-[#1E1B15] pb-4">
+              Salon & Concierge Desk
             </h2>
 
-            <div className="space-y-5 text-xs sm:text-sm">
+            <div className="space-y-6 text-xs sm:text-sm">
               <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-[#1C1914] border border-[#D6A84F]/30 text-[#D6A84F] flex-shrink-0">
+                <div className="p-3 bg-[#181512] border border-[#D6A84F]/30 text-[#D6A84F] flex-shrink-0">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-[#F8F5EF] text-sm">Physical Address</h3>
-                  <p className="text-[#AAA39A] mt-1 leading-relaxed">
+                  <h3 className="font-luxury text-base font-medium text-[#F5F0E8] tracking-wide">Dining Salon Address</h3>
+                  <p className="text-[#8A7E72] mt-1 font-light leading-relaxed">
                     {RESTAURANT_INFO.address.line1}, {RESTAURANT_INFO.address.landmark}
                     <br />
                     {RESTAURANT_INFO.address.city}, {RESTAURANT_INFO.address.state} – {RESTAURANT_INFO.address.pincode}
@@ -85,88 +87,97 @@ export const ContactPage = () => {
                     href={RESTAURANT_INFO.address.googleMapsSearchUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-[#D6A84F] hover:underline mt-2 font-semibold text-xs"
+                    className="inline-flex items-center gap-1 text-[#D6A84F] hover:text-[#F3DC9B] mt-2 font-semibold text-xs tracking-wider uppercase"
                   >
-                    Open In Google Maps →
+                    <span>View In Google Maps</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </a>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-[#1C1914] border border-[#D6A84F]/30 text-[#D6A84F] flex-shrink-0">
+                <div className="p-3 bg-[#181512] border border-[#D6A84F]/30 text-[#D6A84F] flex-shrink-0">
                   <Phone className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-[#F8F5EF] text-sm">Phone Hotline (Demo)</h3>
-                  <p className="text-[#AAA39A] font-mono mt-1">{RESTAURANT_INFO.phone}</p>
-                  <p className="text-[11px] text-[#7A7265]">Line open 11:00 AM – 11:30 PM daily</p>
+                  <h3 className="font-luxury text-base font-medium text-[#F5F0E8] tracking-wide">Concierge Hotline (Demo)</h3>
+                  <p className="text-[#C4B9AA] font-mono mt-1 text-sm">{RESTAURANT_INFO.phone}</p>
+                  <p className="text-[11px] text-[#6A6258] mt-0.5">Lines active 11:00 AM – 11:30 PM Daily</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-[#1C1914] border border-[#D6A84F]/30 text-[#D6A84F] flex-shrink-0">
+                <div className="p-3 bg-[#181512] border border-[#D6A84F]/30 text-[#D6A84F] flex-shrink-0">
                   <Mail className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-[#F8F5EF] text-sm">Electronic Mail</h3>
-                  <p className="text-[#AAA39A] mt-1">{RESTAURANT_INFO.email}</p>
+                  <h3 className="font-luxury text-base font-medium text-[#F5F0E8] tracking-wide">Bespoke Inquiries</h3>
+                  <p className="text-[#8A7E72] mt-1 font-mono">{RESTAURANT_INFO.email}</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-[#1C1914] border border-[#D6A84F]/30 text-[#D6A84F] flex-shrink-0">
+                <div className="p-3 bg-[#181512] border border-[#D6A84F]/30 text-[#D6A84F] flex-shrink-0">
                   <Clock className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-[#F8F5EF] text-sm">Operating Hours</h3>
-                  <div className="text-[#AAA39A] mt-1 space-y-1">
-                    <p>Monday – Thursday: 12:00 PM – 11:30 PM</p>
-                    <p>Friday – Sunday: 12:00 PM – 12:30 AM</p>
-                  </div>
+                  <h3 className="font-luxury text-base font-medium text-[#F5F0E8] tracking-wide">Operating Hours</h3>
+                  <p className="text-[#8A7E72] mt-1 font-light">
+                    Monday to Sunday: 12:00 PM – 11:30 PM
+                  </p>
+                  <p className="text-[11px] text-[#6A6258] mt-0.5">Last seating: 10:45 PM</p>
                 </div>
               </div>
             </div>
-
-            <div className="pt-4 border-t border-[#252018]">
-              <button
-                onClick={openReservation}
-                className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#D6A84F] to-[#B08332] text-[#0B0B0B] font-bold text-xs uppercase tracking-wider hover:brightness-110 shadow-md transition-all flex items-center justify-center gap-2"
-              >
-                <Calendar className="w-4 h-4" />
-                <span>Reserve a Table Online</span>
-              </button>
-            </div>
           </div>
-        </div>
 
-        {/* Right Column: Contact Inquiry Form */}
-        <div className="bg-[#14120E] border border-[#2B251B] rounded-2xl p-6 sm:p-8 shadow-xl">
-          <div className="border-b border-[#252018] pb-4 mb-6">
-            <h2 className="font-serif text-2xl font-bold text-[#F8F5EF]">
-              Send Us a Message
+          {/* Quick Table Reservation Banner */}
+          <div className="border border-[#D6A84F]/40 bg-[#12100E] p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="font-luxury text-xl font-light text-[#F5F0E8]">
+                Planning an Evening Tonight?
+              </h3>
+              <p className="text-xs text-[#8A7E72] font-light mt-1">
+                Tables in the Velvet Room & Main Salon fill quickly on weekends.
+              </p>
+            </div>
+            <button
+              onClick={openReservation}
+              className="btn-luxury-primary px-6 py-3 text-xs tracking-[0.15em] whitespace-nowrap"
+            >
+              Book Table
+            </button>
+          </div>
+        </Reveal>
+
+        {/* Right Column: Contact Form */}
+        <Reveal delay={0.15} className="bg-[#12100E] border border-[#26221B] p-6 sm:p-8 shadow-[0_15px_40px_rgba(0,0,0,0.6)]">
+          <div className="border-b border-[#1E1B15] pb-4 mb-6">
+            <h2 className="font-luxury text-2xl sm:text-3xl font-light text-[#F5F0E8]">
+              Send an Inquiry
             </h2>
-            <p className="text-xs text-[#AAA39A] mt-1">
-              For private events, banquets, or dining feedback.
+            <p className="text-xs text-[#8A7E72] font-light mt-1">
+              For private dining, culinary masterclasses, or corporate events.
             </p>
           </div>
 
           {submitted && (
-            <div className="mb-6 p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 text-xs flex items-center gap-3">
+            <div className="mb-6 p-4 bg-emerald-950/50 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-3">
               <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-              <p>Thank you! Your simulated inquiry has been logged successfully.</p>
+              <p>Thank you. Your simulated message has been received by our concierge.</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-[#F8F5EF] mb-1.5">
-                Your Name <span className="text-[#D6A84F]">*</span>
+              <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#8A7E72] mb-1.5">
+                Full Name <span className="text-[#D6A84F]">*</span>
               </label>
               <input
                 type="text"
-                placeholder="Vikram Malhotra"
+                placeholder="e.g. Vikram Malhotra"
                 {...register('name')}
-                className="w-full bg-[#1B1814] border border-[#302A20] focus:border-[#D6A84F] focus:outline-none rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-[#F8F5EF] placeholder-[#6A6357]"
+                className="w-full bg-[#0A0908] border border-[#2A241C] focus:border-[#D6A84F] focus:outline-none px-4 py-2.5 text-xs sm:text-sm text-[#F5F0E8] placeholder-[#5A5247]"
               />
               {errors.name && (
                 <p className="text-red-400 text-xs mt-1">{errors.name.message}</p>
@@ -175,14 +186,14 @@ export const ContactPage = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-[#F8F5EF] mb-1.5">
+                <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#8A7E72] mb-1.5">
                   Email Address <span className="text-[#D6A84F]">*</span>
                 </label>
                 <input
                   type="email"
                   placeholder="vikram@example.com"
                   {...register('email')}
-                  className="w-full bg-[#1B1814] border border-[#302A20] focus:border-[#D6A84F] focus:outline-none rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-[#F8F5EF] placeholder-[#6A6357]"
+                  className="w-full bg-[#0A0908] border border-[#2A241C] focus:border-[#D6A84F] focus:outline-none px-4 py-2.5 text-xs sm:text-sm text-[#F5F0E8] placeholder-[#5A5247]"
                 />
                 {errors.email && (
                   <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>
@@ -190,14 +201,14 @@ export const ContactPage = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#F8F5EF] mb-1.5">
+                <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#8A7E72] mb-1.5">
                   Phone (Optional)
                 </label>
                 <input
                   type="tel"
-                  placeholder="10-digit number"
+                  placeholder="10-digit mobile"
                   {...register('phone')}
-                  className="w-full bg-[#1B1814] border border-[#302A20] focus:border-[#D6A84F] focus:outline-none rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-[#F8F5EF] placeholder-[#6A6357]"
+                  className="w-full bg-[#0A0908] border border-[#2A241C] focus:border-[#D6A84F] focus:outline-none px-4 py-2.5 text-xs sm:text-sm text-[#F5F0E8] placeholder-[#5A5247]"
                 />
                 {errors.phone && (
                   <p className="text-red-400 text-xs mt-1">{errors.phone.message}</p>
@@ -206,14 +217,14 @@ export const ContactPage = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#F8F5EF] mb-1.5">
+              <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#8A7E72] mb-1.5">
                 Subject <span className="text-[#D6A84F]">*</span>
               </label>
               <input
                 type="text"
-                placeholder="Private Dining / Catering / General Inquiry"
+                placeholder="Private Salon / Masterclass / Bespoke Catering"
                 {...register('subject')}
-                className="w-full bg-[#1B1814] border border-[#302A20] focus:border-[#D6A84F] focus:outline-none rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-[#F8F5EF] placeholder-[#6A6357]"
+                className="w-full bg-[#0A0908] border border-[#2A241C] focus:border-[#D6A84F] focus:outline-none px-4 py-2.5 text-xs sm:text-sm text-[#F5F0E8] placeholder-[#5A5247]"
               />
               {errors.subject && (
                 <p className="text-red-400 text-xs mt-1">{errors.subject.message}</p>
@@ -221,14 +232,14 @@ export const ContactPage = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#F8F5EF] mb-1.5">
+              <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#8A7E72] mb-1.5">
                 Message <span className="text-[#D6A84F]">*</span>
               </label>
               <textarea
                 rows={4}
-                placeholder="Please describe your dining inquiry, expected party size, or dates..."
+                placeholder="Please outline the nature of your event, guest count, or dietary preferences..."
                 {...register('message')}
-                className="w-full bg-[#1B1814] border border-[#302A20] focus:border-[#D6A84F] focus:outline-none rounded-xl p-3 text-xs sm:text-sm text-[#F8F5EF] placeholder-[#6A6357]"
+                className="w-full bg-[#0A0908] border border-[#2A241C] focus:border-[#D6A84F] focus:outline-none p-3 text-xs sm:text-sm text-[#F5F0E8] placeholder-[#5A5247]"
               />
               {errors.message && (
                 <p className="text-red-400 text-xs mt-1">{errors.message.message}</p>
@@ -239,14 +250,14 @@ export const ContactPage = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#D6A84F] to-[#B08332] text-[#0B0B0B] font-bold text-xs uppercase tracking-wider hover:brightness-110 active:scale-[0.99] transition-all shadow-md flex items-center justify-center gap-2"
+                className="btn-luxury-primary w-full py-3.5 text-xs tracking-[0.2em] flex items-center justify-center gap-2"
               >
-                <Send className="w-4 h-4" />
-                <span>Send Inquiry (Simulated)</span>
+                <Send className="w-3.5 h-3.5" />
+                <span>Transmit Inquiry (Simulated)</span>
               </button>
             </div>
           </form>
-        </div>
+        </Reveal>
       </div>
     </div>
   );

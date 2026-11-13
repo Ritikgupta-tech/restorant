@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   ArrowLeft,
   Heart,
@@ -11,6 +12,8 @@ import {
   Check,
   ShieldCheck,
   Share2,
+  UtensilsCrossed,
+  Award,
 } from 'lucide-react';
 import { DISHES } from '../data/dishes';
 import { useCart } from '../context/CartContext';
@@ -19,6 +22,7 @@ import { formatCurrency } from '../utils/formatters';
 import { QuantitySelector } from '../components/common/QuantitySelector';
 import { DietaryBadge, SpiceBadge, SpecialBadge } from '../components/common/Badge';
 import { DishCard } from '../components/menu/DishCard';
+import { Reveal } from '../components/common/ScrollReveal';
 
 export const DishDetailPage = () => {
   const { slug } = useParams();
@@ -34,13 +38,13 @@ export const DishDetailPage = () => {
   if (!dish) {
     return (
       <div className="py-24 text-center max-w-md mx-auto px-4">
-        <h2 className="font-serif text-3xl font-bold text-[#F8F5EF] mb-3">Dish Not Found</h2>
-        <p className="text-xs text-[#AAA39A] mb-6">
-          The dish you are looking for is unavailable or may have been renamed in our seasonal catalogue.
+        <h2 className="font-luxury text-3xl font-light text-[#F5F0E8] mb-3">Dish Not Located</h2>
+        <p className="text-xs text-[#8A7E72] mb-6 font-light">
+          The culinary item you requested is currently off-rotation or has been archived in our seasonal reserve.
         </p>
         <Link
           to="/menu"
-          className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#D6A84F] to-[#B08332] text-[#0B0B0B] font-bold text-xs uppercase tracking-wider"
+          className="btn-luxury-primary px-6 py-3 text-xs tracking-[0.2em]"
         >
           Return to Menu
         </Link>
@@ -65,43 +69,57 @@ export const DishDetailPage = () => {
   };
 
   return (
-    <div className="py-10 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Back button */}
-      <div className="mb-6">
+    <div className="py-10 sm:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Editorial Breadcrumbs & Back */}
+      <Reveal className="flex items-center justify-between mb-8 pb-4 border-b border-[#1E1B15]">
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#AAA39A] hover:text-[#D6A84F] transition-colors"
+          className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#8A7E72] hover:text-[#D6A84F] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to Menu</span>
+          <span>Return to Selection</span>
         </button>
-      </div>
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
-        {/* Left: Food Photography with Zoom Container */}
-        <div className="space-y-4">
-          <div className="relative aspect-[4/3] rounded-3xl overflow-hidden border border-[#D6A84F]/30 bg-[#161411] shadow-2xl group">
+        <div className="flex items-center gap-2 text-xs text-[#6A6258] font-mono tracking-wider">
+          <Link to="/" className="hover:text-[#D6A84F]">Salon</Link>
+          <span>/</span>
+          <Link to="/menu" className="hover:text-[#D6A84F]">Catalogue</Link>
+          <span>/</span>
+          <span className="text-[#D6A84F] truncate max-w-[150px] sm:max-w-none">{dish.name}</span>
+        </div>
+      </Reveal>
+
+      {/* Main Grid: Gallery + Story & Ordering */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+        {/* Left Column: Food Photography */}
+        <Reveal className="space-y-6">
+          <div className="relative aspect-[4/3] overflow-hidden border border-[#D6A84F]/30 bg-[#12100E] shadow-[0_20px_60px_rgba(0,0,0,0.8)] group">
+            {/* Corner Gold Accents */}
+            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#D6A84F] z-10" />
+            <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#D6A84F] z-10" />
+            <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#D6A84F] z-10" />
+            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#D6A84F] z-10" />
+
             <img
               src={dish.image}
               alt={dish.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
 
-            {/* Badges */}
-            <div className="absolute top-4 left-4 flex items-center gap-2">
-              <DietaryBadge isVeg={dish.isVeg} className="bg-black/60 p-1.5" />
-              {dish.chefSpecial && <SpecialBadge text="Chef Signature Dish" />}
+            {/* Badges Overlay */}
+            <div className="absolute top-5 left-5 flex flex-col gap-2 z-10">
+              <DietaryBadge isVeg={dish.isVeg} className="bg-black/80 backdrop-blur-md px-2.5 py-1 text-[11px]" />
+              {dish.chefSpecial && <SpecialBadge text="Chef Signature Special" />}
             </div>
 
             {/* Wishlist toggle */}
             <button
               onClick={() => toggleWishlist(dish.id)}
-              className={`absolute top-4 right-4 p-3 rounded-full backdrop-blur-md transition-all ${
+              className={`absolute top-5 right-5 p-3.5 backdrop-blur-md border transition-all z-10 ${
                 isFav
-                  ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
-                  : 'bg-black/50 text-[#AAA39A] hover:text-[#F8F5EF] border border-white/10'
+                  ? 'bg-rose-500/20 text-rose-400 border-rose-500/50'
+                  : 'bg-black/60 text-[#8A7E72] hover:text-[#F5F0E8] border-white/10 hover:border-[#D6A84F]/50'
               }`}
               aria-label="Save to Wishlist"
             >
@@ -111,73 +129,82 @@ export const DishDetailPage = () => {
 
           {/* Quick Specifications Strip */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-[#14120F] border border-[#262017] p-3 rounded-xl text-center">
-              <span className="text-[10px] uppercase tracking-wider text-[#888176] block mb-1">Dietary</span>
-              <span className={`text-xs font-bold ${dish.isVeg ? 'text-emerald-400' : 'text-rose-400'}`}>
+            <div className="bg-[#12100E] border border-[#221E17] p-4 text-center">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-[#7A7064] block mb-1">Classification</span>
+              <span className={`text-xs font-semibold ${dish.isVeg ? 'text-emerald-400' : 'text-rose-400'}`}>
                 {dish.isVeg ? '100% Vegetarian' : 'Non-Vegetarian'}
               </span>
             </div>
-            <div className="bg-[#14120F] border border-[#262017] p-3 rounded-xl text-center">
-              <span className="text-[10px] uppercase tracking-wider text-[#888176] block mb-1">Calories</span>
-              <span className="text-xs font-bold text-[#F8F5EF]">{dish.calories || '450 kcal'}</span>
+            <div className="bg-[#12100E] border border-[#221E17] p-4 text-center">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-[#7A7064] block mb-1">Culinary Realm</span>
+              <span className="text-xs font-semibold text-[#E0D7CB] capitalize">
+                {dish.category.replace('-', ' ')}
+              </span>
             </div>
-            <div className="bg-[#14120F] border border-[#262017] p-3 rounded-xl text-center">
-              <span className="text-[10px] uppercase tracking-wider text-[#888176] block mb-1">Prep Time</span>
-              <span className="text-xs font-bold text-[#D6A84F]">{dish.prepTime}</span>
+            <div className="bg-[#12100E] border border-[#221E17] p-4 text-center">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-[#7A7064] block mb-1">Aromatics</span>
+              <span className="text-xs font-mono font-semibold text-[#D6A84F]">
+                ≈ {dish.prepTime}
+              </span>
             </div>
           </div>
-        </div>
+        </Reveal>
 
-        {/* Right: Details & Order Controls */}
-        <div className="space-y-6">
+        {/* Right Column: Culinary Notes & Order Box */}
+        <Reveal delay={0.15} className="space-y-8">
           <div>
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D6A84F]">
-                {dish.category.replace('-', ' ')}
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <span className="text-xs font-semibold uppercase tracking-[0.25em] text-[#D6A84F]">
+                {dish.category.replace('-', ' ')} Cuisine
               </span>
               <button
                 onClick={handleShare}
-                className="text-xs text-[#AAA39A] hover:text-[#F8F5EF] flex items-center gap-1.5 transition-colors"
+                className="text-xs text-[#8A7E72] hover:text-[#F5F0E8] flex items-center gap-1.5 transition-colors uppercase tracking-wider"
               >
                 <Share2 className="w-3.5 h-3.5" />
-                <span>{copied ? 'Link Copied!' : 'Share Dish'}</span>
+                <span>{copied ? 'Link Copied!' : 'Share'}</span>
               </button>
             </div>
 
-            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-[#F8F5EF] leading-tight mb-3">
+            <h1 className="font-luxury text-4xl sm:text-5xl md:text-6xl font-light text-[#F5F0E8] leading-tight mb-4 tracking-wide">
               {dish.name}
             </h1>
 
             {/* Rating & Spice Level */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#1E1B15] border border-[#3A3326] text-amber-400 text-xs">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-[#151310] border border-[#2B251B] text-amber-400 text-xs">
                 <Star className="w-3.5 h-3.5 fill-amber-400" />
-                <span className="font-bold text-[#F8F5EF]">{dish.rating}</span>
-                <span className="text-[#888176]">({dish.ratingCount})</span>
+                <span className="font-mono font-bold text-[#F5F0E8]">{dish.rating}</span>
+                <span className="text-[#6A6258]">({dish.ratingCount} reviews)</span>
               </div>
               <SpiceBadge level={dish.spiceLevel} />
+              {dish.isPopular && (
+                <span className="text-[11px] uppercase tracking-wider px-2 py-0.5 bg-[#F59E0B]/10 border border-[#F59E0B]/30 text-[#F59E0B] font-semibold">
+                  Most Ordered
+                </span>
+              )}
             </div>
 
-            <div className="font-serif text-3xl font-bold text-[#D6A84F] mb-6">
+            <div className="font-luxury text-4xl sm:text-5xl font-normal text-gradient-gold mb-6">
               {formatCurrency(dish.price)}
             </div>
 
-            <p className="text-sm sm:text-base text-[#AAA39A] leading-relaxed mb-6">
+            <p className="text-sm sm:text-base text-[#9E9284] leading-relaxed mb-6 font-light">
               {dish.description}
             </p>
           </div>
 
           {/* Key Ingredients */}
           {dish.ingredients && dish.ingredients.length > 0 && (
-            <div className="border-t border-[#262118] pt-6">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#AAA39A] mb-3">
-                Key Ingredients & Aromatics
+            <div className="border-t border-[#1E1B15] pt-6">
+              <h3 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#7A7064] mb-3">
+                Key Ingredients & Heritage Spices
               </h3>
               <div className="flex flex-wrap gap-2">
                 {dish.ingredients.map((item, idx) => (
                   <span
                     key={idx}
-                    className="text-xs px-3 py-1.5 rounded-lg bg-[#181512] border border-[#2D271D] text-[#D6D0C5]"
+                    className="text-xs px-3.5 py-1.5 bg-[#141210] border border-[#262118] text-[#D6D0C5] tracking-wide"
                   >
                     {item}
                   </span>
@@ -186,11 +213,13 @@ export const DishDetailPage = () => {
             </div>
           )}
 
-          {/* Order Control Box */}
-          <div className="border border-[#D6A84F]/30 bg-[#14120E] p-6 rounded-2xl shadow-xl space-y-4">
+          {/* Luxury Order Control Box */}
+          <div className="border border-[#D6A84F]/40 bg-[#12100E] p-6 sm:p-8 shadow-[0_15px_40px_rgba(0,0,0,0.6)] space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-xs font-medium text-[#AAA39A] block mb-1">Select Quantity</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-[#7A7064] block mb-2 font-semibold">
+                  Select Portions
+                </span>
                 <QuantitySelector
                   quantity={quantity}
                   onIncrease={() => setQuantity((q) => q + 1)}
@@ -199,8 +228,10 @@ export const DishDetailPage = () => {
               </div>
 
               <div className="text-right">
-                <span className="text-xs text-[#AAA39A] block">Total Amount</span>
-                <span className="font-serif text-2xl font-bold text-[#D6A84F]">
+                <span className="text-[10px] uppercase tracking-[0.2em] text-[#7A7064] block mb-1">
+                  Payable Subtotal
+                </span>
+                <span className="font-luxury text-3xl sm:text-4xl font-normal text-gradient-gold">
                   {formatCurrency(dish.price * quantity)}
                 </span>
               </div>
@@ -208,41 +239,42 @@ export const DishDetailPage = () => {
 
             <button
               onClick={handleAddToCart}
-              className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-[#D6A84F] to-[#B08332] text-[#0B0B0B] font-bold text-xs sm:text-sm uppercase tracking-wider hover:brightness-110 active:scale-[0.99] transition-all shadow-gold-sm flex items-center justify-center gap-2"
+              className="btn-luxury-primary w-full py-4 text-xs sm:text-sm tracking-[0.2em] flex items-center justify-center gap-2"
             >
-              <ShoppingBag className="w-5 h-5" />
-              <span>Add To Order Cart</span>
+              <ShoppingBag className="w-4 h-4" />
+              <span>Add To Dining Cart</span>
             </button>
           </div>
-        </div>
+        </Reveal>
       </div>
 
       {/* Related Dishes Section */}
       {relatedDishes.length > 0 && (
-        <div className="mt-20 pt-12 border-t border-[#262118]">
-          <div className="flex items-center justify-between mb-8">
+        <Reveal delay={0.2} className="mt-24 pt-16 border-t border-[#1E1B15]">
+          <div className="flex items-center justify-between mb-10">
             <div>
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D6A84F] block mb-1">
-                More From This Category
+              <span className="text-xs font-semibold uppercase tracking-[0.25em] text-[#D6A84F] block mb-2">
+                Curator's Recommendation
               </span>
-              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#F8F5EF]">
-                You May Also Relish
+              <h2 className="font-luxury text-3xl sm:text-4xl font-light text-[#F5F0E8]">
+                Complementary <span className="italic text-gradient-gold">Delicacies</span>
               </h2>
             </div>
             <Link
               to="/menu"
-              className="text-xs font-bold text-[#D6A84F] hover:underline uppercase tracking-wider"
+              className="text-xs font-semibold text-[#D6A84F] hover:text-[#F3DC9B] uppercase tracking-[0.2em] flex items-center gap-1"
             >
-              View Full Menu
+              <span>View All</span>
+              <span>→</span>
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {relatedDishes.map((rDish) => (
               <DishCard key={rDish.id} dish={rDish} />
             ))}
           </div>
-        </div>
+        </Reveal>
       )}
     </div>
   );
