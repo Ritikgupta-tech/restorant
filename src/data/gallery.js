@@ -1,0 +1,66 @@
+// Gallery Dataset with categorized high-resolution photography
+export const GALLERY_ITEMS = [
+  {
+    id: "gal-01",
+    title: "Grand Dining Chamber",
+    category: "ambience",
+    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80",
+    description: "Intimate velvet seating, warm golden chandeliers, and acoustic elegance for an elevated evening.",
+  },
+  {
+    id: "gal-02",
+    title: "Artisanal Sizzle Platter",
+    category: "food",
+    image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1200&q=80",
+    description: "Flamed over hot cast iron with butter and garden herbs, served piping hot at your table.",
+  },
+  {
+    id: "gal-03",
+    title: "The Golden Cocktail Bar",
+    category: "interior",
+    image: "https://images.unsplash.com/photo-1572116469696-31de0f17cc34?auto=format&fit=crop&w=1200&q=80",
+    description: "Handcrafted brass fixtures, curated spirit library, and expert mixology.",
+  },
+  {
+    id: "gal-04",
+    title: "Master Chef Plating",
+    category: "experience",
+    image: "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=1200&q=80",
+    description: "Every garnish and glaze placed with pinpoint precision by our culinary team.",
+  },
+  {
+    id: "gal-05",
+    title: "Handcrafted Sourdough Pizza",
+    category: "food",
+    image: "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?auto=format&fit=crop&w=1200&q=80",
+    description: "Wood-fired to a crisp, bubbling blister crust with fresh San Marzano tomatoes and basil.",
+  },
+  {
+    id: "gal-06",
+    title: "Private Dining Suite",
+    category: "interior",
+    image: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1200&q=80",
+    description: "Exclusive banquet salon tailored for private family celebrations and executive dinners.",
+  },
+  {
+    id: "gal-07",
+    title: "Royal Dum Handi Biryani",
+    category: "food",
+    image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=1200&q=80",
+    description: "Unsealed at tableside releasing intoxicating vapors of saffron and slow-braised spices.",
+  },
+  {
+    id: "gal-08",
+    title: "Candlelit Evening Tables",
+    category: "ambience",
+    image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1200&q=80",
+    description: "Romantic candlelit alcoves designed for quiet conversations and memorable occasions.",
+  },
+  {
+    id: "gal-09",
+    title: "Artisanal Dessert Presentation",
+    category: "food",
+    image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=1200&q=80",
+    description: "Molten Belgian chocolate topped with pure 24K edible gold leaf and vanilla bean gelato.",
+  },
+];
